@@ -284,26 +284,26 @@ body {
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 6px;
+  padding: 10px 14px;
   background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .metric-card {
-  background: var(--bg-card);
+  background: rgba(20, 23, 34, 0.65);
   backdrop-filter: blur(8px);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 10px 12px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   transition: transform var(--transition-fast), border-color var(--transition-fast);
 }
 
 .metric-card:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.14);
   transform: translateY(-1px);
 }
 
@@ -312,15 +312,15 @@ body {
   align-items: center;
   justify-content: space-between;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .metric-header svg {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
 }
 
 .metric-card.viewers svg { color: var(--accent-rose); }
@@ -329,7 +329,7 @@ body {
 .metric-card.comments svg { color: var(--accent-sky); }
 
 .metric-value {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.5px;
@@ -350,7 +350,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 7px 14px;
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-subtle);
   gap: 8px;
@@ -359,9 +359,11 @@ body {
 .filter-pills {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   overflow-x: auto;
   scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
 }
 
 .filter-pills::-webkit-scrollbar {
@@ -369,21 +371,24 @@ body {
 }
 
 .pill-btn {
-  padding: 4px 10px;
+  padding: 3px 8px;
   font-size: 11px;
   font-weight: 500;
   border-radius: var(--radius-full);
-  background: var(--bg-card);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
   transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .pill-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-card-hover);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .pill-btn.active {
@@ -394,19 +399,26 @@ body {
 
 .chat-search-wrap {
   position: relative;
-  width: 140px;
+  width: 110px;
+  flex-shrink: 0;
+  transition: width 0.2s ease;
+}
+
+.chat-search-wrap:focus-within {
+  width: 135px;
 }
 
 .chat-search-input {
   width: 100%;
-  height: 28px;
+  height: 26px;
   padding: 0 8px 0 24px;
   border-radius: var(--radius-full);
-  background: var(--bg-card);
+  background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border-subtle);
   color: var(--text-primary);
   font-size: 11px;
   outline: none;
+  transition: border-color 0.15s;
 }
 
 .chat-search-input:focus {
@@ -791,8 +803,8 @@ body {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
   z-index: 200;
   align-items: center;
   justify-content: center;
@@ -804,37 +816,57 @@ body {
 }
 
 .modal-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  background: #11131c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
   width: 100%;
   max-width: 440px;
-  box-shadow: var(--shadow-lg);
+  max-height: 85vh;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: slideInUp 0.25s ease;
+  animation: slideInUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-header {
-  padding: 16px 20px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
+  letter-spacing: -0.2px;
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 16px 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   font-size: 13px;
+  overflow-y: auto;
+  max-height: calc(85vh - 52px);
+  scrollbar-width: thin;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
 }
 
 .setting-item {
@@ -853,11 +885,13 @@ body {
 .setting-title {
   font-weight: 500;
   color: var(--text-primary);
+  font-size: 13px;
 }
 
 .setting-desc {
   font-size: 11px;
   color: var(--text-muted);
+  line-height: 1.4;
 }
 
 /* Switch Toggle */
@@ -879,8 +913,8 @@ body {
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   transition: var(--transition-fast);
   border-radius: var(--radius-full);
 }
@@ -908,16 +942,40 @@ input:checked + .slider:before {
 
 /* QR / Remote Link Box */
 .remote-link-box {
-  background: var(--bg-card);
-  border: 1px dashed var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: monospace;
-  font-size: 12px;
-  color: var(--accent-sky);
+  gap: 8px;
+}
+
+.remote-link-box span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11.5px;
+  color: #79c0ff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remote-link-box button {
+  flex-shrink: 0;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+  transition: all 0.15s ease;
+}
+
+.remote-link-box button:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #fff;
 }
 
 /* Scrollbar styling */
