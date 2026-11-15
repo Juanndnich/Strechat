@@ -123,6 +123,9 @@
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <input type="text" id="chat-search-input" class="chat-search-input" placeholder="Cari komentar...">
     </div>
+    <button class="btn-clear-chat" id="btn-clear-chat" title="Bersihkan riwayat obrolan di layar" style="height: 26px; width: 26px; flex-shrink: 0;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+    </button>
   </div>
 
   <!-- Floating Gift Banner Popups Area -->
@@ -190,6 +193,26 @@
             <input type="checkbox" id="setting-tts">
             <span class="slider"></span>
           </label>
+        </div>
+
+        <div class="setting-item" style="border-top: 1px solid var(--border-subtle); padding-top: 12px; flex-direction: column; align-items: stretch; gap: 8px;">
+          <div class="setting-label">
+            <span class="setting-title">Ukuran Teks Obrolan</span>
+            <span class="setting-desc">Sesuaikan ukuran font pesan agar nyaman dibaca dari jarak jauh</span>
+          </div>
+          <div class="font-size-group" id="font-size-group" style="display: flex; gap: 6px;">
+            <button class="pill-btn font-size-btn active" data-size="normal" style="flex: 1; justify-content: center;">Normal</button>
+            <button class="pill-btn font-size-btn" data-size="small" style="flex: 1; justify-content: center;">Kecil</button>
+            <button class="pill-btn font-size-btn" data-size="large" style="flex: 1; justify-content: center;">Besar</button>
+          </div>
+        </div>
+
+        <div class="setting-item" style="border-top: 1px solid var(--border-subtle); padding-top: 12px; flex-direction: column; align-items: stretch; gap: 8px;">
+          <div class="setting-label">
+            <span class="setting-title">Filter Kata Terlarang (Blacklist)</span>
+            <span class="setting-desc">Sensor kata kasar/spam otomatis (pisahkan dengan koma)</span>
+          </div>
+          <input type="text" id="setting-blacklist" class="chat-search-input" style="width: 100%; border-radius: 8px; height: 30px; padding: 0 10px;" placeholder="Contoh: kasar, spam, judi">
         </div>
 
         <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 8px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">

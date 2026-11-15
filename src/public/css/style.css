@@ -408,6 +408,24 @@ body {
   width: 170px;
 }
 
+.btn-clear-chat {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.btn-clear-chat:hover {
+  color: var(--accent-rose);
+  border-color: rgba(244, 63, 94, 0.4);
+  background: rgba(244, 63, 94, 0.08);
+}
+
 .chat-search-input {
   width: 100%;
   height: 26px;
@@ -711,6 +729,42 @@ body {
   line-height: 1.4;
   color: var(--text-primary);
   word-break: break-word;
+}
+
+/* Chat Font Size Variants (P3.3) */
+[data-chat-size="small"] .chat-text {
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+[data-chat-size="small"] .chat-nickname {
+  font-size: 11px;
+}
+[data-chat-size="small"] .chat-avatar,
+[data-chat-size="small"] .chat-avatar-placeholder {
+  width: 26px;
+  height: 26px;
+}
+
+[data-chat-size="normal"] .chat-text {
+  font-size: 13px;
+  line-height: 1.4;
+}
+[data-chat-size="normal"] .chat-nickname {
+  font-size: 12px;
+}
+
+[data-chat-size="large"] .chat-text {
+  font-size: 15.5px;
+  line-height: 1.55;
+  font-weight: 500;
+}
+[data-chat-size="large"] .chat-nickname {
+  font-size: 13.5px;
+}
+[data-chat-size="large"] .chat-avatar,
+[data-chat-size="large"] .chat-avatar-placeholder {
+  width: 36px;
+  height: 36px;
 }
 
 .chat-actions {

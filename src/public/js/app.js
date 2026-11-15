@@ -339,6 +339,7 @@
     }
 
     const timeString = new Date(chat.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const filteredComment = filterBannedWords(chat.comment);
 
     item.innerHTML = `
       ${avatarHtml}
@@ -348,7 +349,7 @@
           ${badgesHtml}
           <span class="chat-time">${timeString}</span>
         </div>
-        <div class="chat-text">${chat.comment}</div>
+        <div class="chat-text">${filteredComment}</div>
       </div>
       <div class="chat-actions">
         <button class="chat-action-btn btn-pin-item" title="Sematkan Pesan">
@@ -362,7 +363,7 @@
     if (btnPinItem) {
       btnPinItem.addEventListener('click', (e) => {
         e.stopPropagation();
-        pinMessage(chat.nickname, chat.comment);
+        pinMessage(chat.nickname, filteredComment);
       });
     }
 
@@ -790,6 +791,43 @@
       saveSettings({ ttsEnabled: isChecked });
     });
 
+    // Clear Chat DOM Feed (P3.2)
+    const btnClearChat = document.getElementById('btn-clear-chat');
+    if (btnClearChat) {
+      btnClearChat.addEventListener('click', () => {
+        const items = el.chatContainer.querySelectorAll('.chat-item, .chat-item-gift');
+        items.forEach(i => i.remove());
+        if (el.chatEmpty) {
+          el.chatEmpty.style.display = 'flex';
+          const h3 = el.chatEmpty.querySelector('h3');
+          if (h3) h3.textContent = 'Obrolan Telah Dibersihkan';
+          const p = el.chatEmpty.querySelector('p');
+          if (p) p.textContent = 'Komentar baru akan otomatis muncul di sini saat penonton mengirim pesan.';
+        }
+        showNotification('Riwayat obrolan di layar telah dibersihkan', 'info');
+      });
+    }
+
+    // Chat Font Size Selector (P3.3)
+    const fontSizeBtns = document.querySelectorAll('.font-size-btn');
+    fontSizeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const size = btn.dataset.size;
+        applyChatFontSize(size);
+        saveSettings({ chatFontSize: size });
+      });
+    });
+
+    // Chat Blacklist Filter
+    const settingBlacklist = document.getElementById('setting-blacklist');
+    if (settingBlacklist) {
+      settingBlacklist.addEventListener('input', (e) => {
+        const val = e.target.value;
+        updateBannedWordsList(val);
+        saveSettings({ bannedWords: val });
+      });
+    }
+
     // Window controls (Electron Native & Browser Fallback)
     if (el.btnClose) {
       el.btnClose.addEventListener('click', () => {
@@ -841,17 +879,52 @@
   const SETTINGS_KEY = 'strechat_settings';
   const DEFAULT_SETTINGS = {
     soundEnabled: true,
-    ttsEnabled: false
+    ttsEnabled: false,
+    chatFontSize: 'normal',
+    bannedWords: ''
   };
+
+  let bannedWordsList = [];
+  function updateBannedWordsList(raw) {
+    if (typeof raw !== 'string' || !raw.trim()) {
+      bannedWordsList = [];
+      return;
+    }
+    bannedWordsList = raw.split(',').map(w => w.trim().toLowerCase()).filter(Boolean);
+  }
+
+  function filterBannedWords(text) {
+    if (!text || bannedWordsList.length === 0) return text;
+    let filtered = text;
+    for (const word of bannedWordsList) {
+      if (!word) continue;
+      const regex = new RegExp(word.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+      filtered = filtered.replace(regex, '***');
+    }
+    return filtered;
+  }
+
+  function applyChatFontSize(size) {
+    const validSizes = ['small', 'normal', 'large'];
+    const chosen = validSizes.includes(size) ? size : 'normal';
+    document.body.setAttribute('data-chat-size', chosen);
+    const btns = document.querySelectorAll('.font-size-btn');
+    btns.forEach(b => {
+      b.classList.toggle('active', b.dataset.size === chosen);
+    });
+  }
 
   function loadSettings() {
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
       if (!raw) return { ...DEFAULT_SETTINGS };
       const parsed = JSON.parse(raw);
+      const validSizes = ['small', 'normal', 'large'];
       return {
         soundEnabled: typeof parsed?.soundEnabled === 'boolean' ? parsed.soundEnabled : DEFAULT_SETTINGS.soundEnabled,
-        ttsEnabled: typeof parsed?.ttsEnabled === 'boolean' ? parsed.ttsEnabled : DEFAULT_SETTINGS.ttsEnabled
+        ttsEnabled: typeof parsed?.ttsEnabled === 'boolean' ? parsed.ttsEnabled : DEFAULT_SETTINGS.ttsEnabled,
+        chatFontSize: validSizes.includes(parsed?.chatFontSize) ? parsed.chatFontSize : DEFAULT_SETTINGS.chatFontSize,
+        bannedWords: typeof parsed?.bannedWords === 'string' ? parsed.bannedWords : DEFAULT_SETTINGS.bannedWords
       };
     } catch (e) {
       console.warn('[strechat] Gagal membaca pengaturan dari localStorage, menggunakan default:', e);
@@ -883,6 +956,14 @@
     if (el.settingTts) {
       el.settingTts.checked = settings.ttsEnabled;
       if (window.ttsEngine) window.ttsEngine.enabled = settings.ttsEnabled;
+    }
+
+    // Restore Font Size & Blacklist
+    applyChatFontSize(settings.chatFontSize);
+    const settingBlacklist = document.getElementById('setting-blacklist');
+    if (settingBlacklist) {
+      settingBlacklist.value = settings.bannedWords;
+      updateBannedWordsList(settings.bannedWords);
     }
 
     setupEventListeners();

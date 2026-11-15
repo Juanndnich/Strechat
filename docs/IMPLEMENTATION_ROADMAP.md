@@ -21,11 +21,11 @@ Dokumen ini memetakan tahapan implementasi teknis Strechat dari tahap stabilitas
 
 ---
 
-## 📌 Phase 3 — Streamer Experience & Usability (P3) — SEDANG BERJALAN 🔄
+## 📌 Phase 3 — Streamer Experience & Usability (P3) — SELESAI ✅
 - [x] **System Tray & Minimize to Tray (P3.1):** Berjalan di latar belakang dengan ikon area notifikasi OS, toggle hide/restore, pencegahan double shutdown, dan backgroundThrottling: false.
-- [ ] **Clear Chat Button (P3.2):** Tombol sekali klik untuk membersihkan tampilan obrolan di layar tanpa memutuskan koneksi live.
-- [ ] **Font Size Adjustment (P3.3):** Opsi pengaturan ukuran teks obrolan (Kecil, Normal, Besar) untuk kemudahan membaca dari jarak jauh.
-- [ ] **Bad Words / Chat Filter:** Penyaringan kata terlarang dan spam pada overlay dan antarmuka.
+- [x] **Clear Chat Button (P3.2):** Tombol sekali klik untuk membersihkan tampilan obrolan di layar tanpa memutuskan koneksi live dan tanpa mereset statistik sesi.
+- [x] **Font Size Adjustment (P3.3):** Opsi pengaturan ukuran teks obrolan (Kecil, Normal, Besar) yang diterapkan langsung tanpa reload dan tersimpan di `localStorage`.
+- [x] **Bad Words / Chat Filter:** Penyaringan kata terlarang otomatis case-insensitive dengan proteksi regex (`***`).
 
 ---
 

@@ -4,11 +4,13 @@ Semua perubahan penting pada proyek Strechat didokumentasikan di berkas ini.
 
 ## [1.0.0] - 2026-11-15
 
-### Usability & Streamer Experience (P3.1)
+### Usability & Streamer Experience (P3)
 - **System Tray Integration:** Menambahkan dukungan System Tray native dengan menu konteks "Buka Strechat" dan "Keluar dari Aplikasi", serta toggle tampilkan/sembunyikan jendela via klik kiri ikon tray.
 - **Hide-to-Tray Lifecycle:** Mengalihkan tombol tutup jendela (`X`) untuk menyembunyikan aplikasi ke System Tray agar monitoring live stream tidak terputus di latar belakang.
 - **Background Throttling Disabled:** Mengatur `backgroundThrottling: false` pada BrowserWindow sehingga audio chime, TTS, dan WebSocket broadcast ke OBS overlay tetap berjalan instan saat aplikasi tersembunyi.
-- **Tray Cleanup & Shutdown Safety:** Mengelola instance Tray dengan `tray.destroy()` dan flag `isQuitting` untuk mencegah *double shutdown* atau proses tertinggal.
+- **Clear Chat Feed (P3.2):** Tombol pembersih obrolan di layar sekali klik tanpa memutus koneksi live dan tanpa mereset akumulasi metrik analitik sesi.
+- **Dynamic Font Size Selector (P3.3):** Tiga opsi ukuran teks pesan obrolan (Kecil, Normal, Besar) yang diterapkan seketika dan tersimpan di `localStorage`.
+- **Bad Words Moderation:** Filter kata terlarang/spam otomatis dengan masking `***` yang tersimpan pada preferensi pengguna.
 
 ### Keamanan (Security - P1)
 - **Navigation Guard:** Menambahkan `setWindowOpenHandler` dan `will-navigate` pada Electron Main Process untuk memastikan seluruh tautan eksternal dibuka melalui browser default OS (`shell.openExternal`) dan memblokir navigasi tidak sah di dalam frame aplikasi.
