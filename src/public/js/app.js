@@ -722,8 +722,13 @@
     if (btnQuitApp) {
       btnQuitApp.addEventListener('click', () => {
         if (window.electronAPI && window.electronAPI.isElectron) {
-          window.electronAPI.close();
+          if (typeof window.electronAPI.quit === 'function') {
+            window.electronAPI.quit();
+          } else {
+            window.electronAPI.close();
+          }
         } else {
+          if (state.connected) sendWsAction('disconnect');
           window.close();
           showNotification('Silakan tutup tab browser Anda untuk keluar.', 'info');
         }

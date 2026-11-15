@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),
   close: () => ipcRenderer.send('window-close'),
+  quit: () => ipcRenderer.send('app-quit'),
   setAlwaysOnTop: (flag) => ipcRenderer.send('window-pin', flag),
   openExternal: (url) => ipcRenderer.send('open-external', url),
   onWindowStateChange: (callback) => {
