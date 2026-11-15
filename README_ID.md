@@ -1,128 +1,115 @@
-# strechat 🚀 (Panduan Bahasa Indonesia)
+# strechat 🚀
 
-> **Aplikasi Desktop Ringan & Cepat untuk Memonitor Live Chat TikTok di Luar OBS.**  
-> Pantau obrolan live TikTok, jumlah penonton, GIF & gift yang masuk, jumlah suka (likes), serta komentar secara real-time tanpa delay dengan tampilan minimalis font Poppins.
+> **Aplikasi Pendamping & Pemantau Live TikTok Ringan, Zero-Delay untuk Desktop dan OBS Studio.**  
+> Pantau aktivitas TikTok LIVE Anda di luar OBS secara real-time: jumlah penonton langsung, animasi gift, kecepatan suka (tap), papan peringkat donatur, analitik sesi, overlay transparan OBS, dan notifikasi audio/TTS.
 
----
-
-## 🌟 Fitur Utama strechat
-
-1. **⚡ Pemantauan Real-Time Tanpa Delay (Zero-Delay)**:
-   - Terhubung langsung ke aliran webcast TikTok menggunakan WebSocket lokal yang sangat responsif.
-2. **👁️ Pemantau Jumlah Penonton (Live Viewers & Puncak)**:
-   - Menampilkan jumlah penonton aktif saat ini dan mencatat rekor puncak penonton dalam satu sesi live.
-3. **💖 Penghitung Suka & Animasi Detak Jantung**:
-   - Jumlah tap suka bertambah otomatis dengan animasi detak jantung yang halus.
-4. **🎁 Notifikasi Gift & GIF Interaktif**:
-   - Spanduk animasi melayang saat ada penonton yang mengirim gift atau GIF.
-   - Penghitung combo berulang (`x5`, `x10`, `x50`).
-   - Akumulasi perolehan diamond / koin gift.
-   - Suara lonceng sintetis prosedural via Web Audio API (tidak butuh file eksternal, anti gagal putar).
-5. **💬 Aliran Komentar Bersih & Interaktif**:
-   - Tampilan tipografi **Poppins** yang nyaman dibaca dan tidak melelahkan mata.
-   - Lencana khusus penonton (**MOD**, **SUB**).
-   - **Fitur Sematkan Pesan (Pin Message)**: Klik tombol pin pada komentar mana saja untuk menyematkannya di bagian atas agar tidak terlewat.
-   - **Filter Cepat**: Filter obrolan berdasarkan *Semua*, *Pertanyaan Saja (?)*, *Moderator Saja*, serta kotak pencarian kata kunci langsung.
-6. **🗣️ Text-To-Speech (TTS) Suara Otomatis**:
-   - Dapat membacakan nama pengirim dan jenis gift yang masuk secara otomatis lewat suara sistem.
-7. **📱 Fleksibel untuk Semua Perangkat (Multi-Device / LAN Mode)**:
-   - Selain sebagai aplikasi desktop mandiri, Anda dapat membuka URL lokal (tersedia di menu Pengaturan) pada smartphone, tablet (iPad/Android), atau laptop kedua di jaringan Wi-Fi yang sama untuk dijadikan monitor cadangan di samping meja streaming.
-8. **🛡️ Arsitektur Kompleks dan Aman**:
-   - Sanitasi input ketat terhadap serangan XSS dan injeksi skrip.
-   - Isolasi konteks Electron (Context Isolation & CSP).
-   - Auto-reconnect dengan jeda bertingkat (*exponential backoff*) jika koneksi internet sempat terputus.
-9. **🎮 Mode Demo Terintegrasi**:
-   - Tombol bintang untuk mengaktifkan simulasi obrolan, gift, suka, dan penonton palsu secara realistis agar Anda bisa menguji tampilan dan animasi sebelum mulai streaming langsung.
+[![Rilis](https://img.shields.io/badge/rilis-v1.0.0-indigo.svg)](https://github.com/Juanndnich/Strechat/releases)
+[![Lisensi: MIT](https://img.shields.io/badge/Lisensi-MIT-yellow.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20OBS-blue.svg)](#)
 
 ---
 
-## 🚀 Panduan Menjalankan Aplikasi
+## 🌟 Fitur Utama
 
-### 1. Persiapan
-Pastikan komputer sudah terpasang **Node.js** (versi 18 ke atas) dan **Git**.
+- **⚡ Koneksi Langsung Webcast TikTok**: Terhubung langsung ke server resmi WebSocket Webcast TikTok (`piratetok-live-js`). 100% gratis tanpa biaya langganan EulerStream atau pihak ketiga.
+- **👁️ Jumlah Penonton Langsung & Rekor Puncak**: Pantau penonton aktif dan rekor puncak penonton (*peak viewers*) dengan sinkronisasi polling otomatis setiap 6 detik.
+- **💖 Penghitung Suka (Tap Layar)**: Animasi detak jantung interaktif saat penonton mengetuk layar live Anda.
+- **🎁 Banner Gift Melayang Cerdas**:
+  - Pool banner mengambang maksimal 2 kartu agar obrolan chat tidak pernah tertutup.
+  - Pengelompokan combo gift berturut-turut (`x5`, `x10`, `x50`).
+  - Perhitungan akumulasi koin dan diamond secara otomatis.
+  - Nada lonceng (*chime*) prosedural melalui Web Audio API (0 KB file audio fisik).
+- **📊 Analitik Sesi Live & Papan Peringkat Donatur**:
+  - Rangkuman live: Durasi stream, peak viewers, rata-rata penonton, total diamond, dan total suka.
+  - **Papan Peringkat Top 5 Donatur** terupdate secara real-time.
+  - **Ekspor Laporan 1-Klik**: Unduh laporan lengkap sesi live dalam format **CSV** atau **JSON**.
+- **💬 Aliran Obrolan Real-Time**:
+  - Tipografi Poppins bersih dengan pilihan ukuran font (**Kecil**, **Normal**, **Besar**).
+  - Tombol **Bersihkan Obrolan di Layar** tanpa memutus koneksi live dan tanpa mereset statistik sesi.
+  - Bar **Sematkan Pesan (Pin Message)**.
+  - **Filter Kata Kasar / Terlarang** otomatis dengan masking `***`.
+  - Filter pill (*Semua*, *Hanya Gift*) dan pencarian pesan instan.
+- **🎬 Integrasi Penuh OBS Studio**:
+  - **Overlay Transparan Chat (`http://localhost:3000/overlay`)**: Latar belakang transparan dengan outline teks kontras tinggi untuk *Browser Source* di OBS.
+  - **OBS Custom Browser Dock (`http://localhost:3000`)**: Tempelkan panel dasbor langsung ke dalam jendela OBS Studio Anda.
+- **📥 System Tray & Pemrosesan Latar Belakang**:
+  - Sembunyikan aplikasi ke System Tray saat tombol tutup ditekan agar live monitoring tidak terganggu.
+  - Suara notifikasi, TTS, dan stream overlay OBS tetap berjalan instan dengan `backgroundThrottling: false`.
+- **🗣️ Text-To-Speech (TTS)**: Suara buatan otomatis membacakan nama pengirim gift dan jenis gift yang masuk.
+- **📱 Akses Jaringan Lokal (HP / Tablet)**: Deteksi otomatis IP host untuk memantau dari smartphone atau tablet pada jaringan Wi-Fi yang sama.
+- **🛡️ Keamanan Berlapis**: Context Isolation Electron, Sandbox Renderer ketat (`sandbox: true`), proteksi navigasi eksternal (`shell.openExternal`), dan sanitasi XSS.
+- **🎮 Mode Demo Bawaan**: Simulasi obrolan, gift, dan suka secara realistis hanya dengan 1 klik untuk pengetesan layout sebelum mulai live streaming.
 
-### 2. Instalasi Dependensi
-Buka terminal / PowerShell di direktori proyek:
+---
+
+## 📦 Pemasangan & Panduan Memulai
+
+### Prasyarat
+- Node.js versi 18.0.0 atau lebih baru
+- npm
+
+### 1. Kloning & Pasang Dependensi
 ```bash
+git clone https://github.com/Juanndnich/Strechat.git
+cd Strechat
 npm install
 ```
 
-### 3. Menjalankan Aplikasi Desktop
+### 2. Jalankan Pengujian Unit Otomatis
+```bash
+npm test
+```
+
+### 3. Jalankan Aplikasi Desktop
 ```bash
 npm start
 ```
-Aplikasi desktop `strechat` akan langsung terbuka dengan tampilan frameless minimalis, tombol Always-on-Top (sematkan di atas layar), minimize, maximize, dan close.
 
-### 4. Integrasi Langsung ke OBS Studio
-
-#### A. Chat Overlay Transparan di Layar Stream (Browser Source)
-1. Di OBS Studio, klik tombol **+** pada panel **Sources**.
-2. Pilih **Browser**.
-3. Beri nama (misal: `TikTok Chat Overlay`).
-4. Masukkan URL: `http://localhost:3000/overlay`
-5. Atur Width: `450`, Height: `600`.
-6. Klik **OK**. Chat dan gift live TikTok akan muncul melayang secara transparan di atas layar stream Anda dengan animasi pop-in dan auto-fade!
-
-#### B. Menempelkan Panel strechat ke dalam OBS (Custom Browser Docks)
-1. Di menu atas OBS Studio, klik **Docks** -> **Custom Browser Docks...** (Dok Peramban Kustom).
-2. Di kolom **Dock Name**, ketik: `strechat`.
-3. Di kolom **URL**, masukkan: `http://localhost:3000`
-4. Klik **Apply**. Panel lengkap strechat akan menempel langsung sebagai sidebar di jendela OBS Anda!
-
-### 5. Menjalankan Mode Web / Server Saja
-Jika ingin mengakses lewat browser komputer atau ponsel:
+### 4. Jalankan Server Web / Headless (Untuk Akses Browser / HP)
 ```bash
 npm run server
 ```
-Buka `http://localhost:3000` di browser Anda.
+Buka alamat `http://localhost:3000` di browser atau buka IP LAN yang muncul di terminal melalui browser ponsel Anda.
 
 ---
 
-## 📦 Membuat File Installer Rilis GitHub (Windows, Mac, Linux)
+## 🎥 Panduan Integrasi OBS Studio
 
-Aplikasi telah dilengkapi konfigurasi `electron-builder` sehingga siap dikompilasi menjadi paket instalasi:
+### A. Overlay Transparan Chat (Browser Source)
+1. Di OBS Studio, pada panel **Sources**, klik tombol **+** -> pilih **Browser**.
+2. Beri nama: `Strechat Overlay`.
+3. Masukkan **URL**: `http://localhost:3000/overlay`
+4. Atur **Width**: `480`, **Height**: `720` (sesuaikan dengan scene Anda).
+5. Centang **Shutdown source when not visible** (opsional).
+6. Klik **OK**. Gelembung chat transparan akan melayang di atas gameplay atau kamera Anda.
+
+### B. Menempelkan Panel di Jendela OBS (Custom Browser Dock)
+1. Di OBS Studio, buka menu atas: **Docks** -> **Custom Browser Docks...**
+2. Pada kolom **Dock Name**, ketik: `Strechat Monitor`
+3. Pada kolom **URL**, masukkan: `http://localhost:3000`
+4. Klik **Apply**. Anda dapat menyeret dan menempelkan panel ini di mana saja di dalam OBS.
+
+---
+
+## 🛠️ Membangun File Installer Mandiri
+
+Anda dapat mengompilasi `strechat` menjadi file installer aplikasi desktop:
 
 ```bash
-# Untuk Windows (.exe installer & portable):
+# Untuk Windows (.exe installer NSIS & portable)
 npm run dist:win
 
-# Untuk macOS (.dmg & .zip):
+# Untuk macOS (.dmg & .zip)
 npm run dist:mac
 
-# Untuk Linux (.AppImage & .deb):
+# Untuk Linux (.AppImage & .deb)
 npm run dist:linux
 ```
-File executable (.exe) yang siap dibagikan kepada pengguna akan otomatis tersimpan di folder `dist/`.
+
+Hasil berkas executable akan tersimpan di dalam folder `dist/`.
 
 ---
 
-## 🌐 Memublikasikan Rilis Pertama di GitHub
+## 📄 Lisensi
 
-Untuk mempublikasikan versi awal (v1.0.0) ke GitHub:
-
-1. **Inisialisasi & Commit ke Git**:
-   ```bash
-   git add .
-   git commit -m "feat: inisialisasi strechat v1.0.0 - aplikasi pemantau live tiktok"
-   ```
-
-2. **Hubungkan ke Repositori GitHub Anda**:
-   ```bash
-   git branch -M main
-   git remote add origin https://github.com/USERNAME-ANDA/strechat.git
-   git push -u origin main
-   ```
-
-3. **Buat Tag Rilis**:
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
-
-4. **GitHub Actions Otomatis**:
-   File `.github/workflows/build-release.yml` yang sudah kami sertakan akan secara otomatis menjalankan proses kompilasi rilis multi-platform (Windows, macOS, Ubuntu) dan mengunggah file instalasi ke tab **Releases** di repositori GitHub Anda.
-
----
-
-## 📝 Lisensi
-Proyek ini dilisensikan di bawah Lisensi MIT. Bebas dimodifikasi dan didistribusikan.
+Didistribusikan di bawah lisensi MIT. Lihat berkas [LICENSE](LICENSE) untuk informasi lebih lanjut.

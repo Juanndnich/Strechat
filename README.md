@@ -1,63 +1,44 @@
 # strechat 🚀
 
-> **Lightweight, Zero-Delay TikTok Live Monitor & Chat Companion for Desktop and Multi-Device Streams.**  
-> Monitor your TikTok Live stream outside OBS with real-time viewer counts, animated incoming gifts & GIFs, like velocity, pinned comments, and audio/TTS alerts.
+> **Lightweight, Zero-Delay TikTok Live Monitor & OBS Streaming Companion.**  
+> Monitor your TikTok Live stream outside OBS with real-time viewer counts, animated gifts, like velocity, top donor leaderboards, session analytics, transparent OBS overlays, and audio/TTS alerts.
 
-[![Release](https://img.shields.io/badge/release-v1.0.0-indigo.svg)](https://github.com/strechat/strechat/releases)
+[![Release](https://img.shields.io/badge/release-v1.0.0-indigo.svg)](https://github.com/Juanndnich/Strechat/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Web-blue.svg)](#)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20OBS-blue.svg)](#)
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Capabilities
 
-- **⚡ Zero-Delay Real-Time WebSocket Engine**: Instant delivery of comments, likes, and gifts with no buffering lag.
-- **👁️ Live Viewers & Peak Tracker**: Monitor real-time audience size and track the highest peak viewers in your session.
-- **💖 Interactive Likes Counter & Heartbeat Animation**: Visual feedback with heart animations as viewers tap on your live stream.
-- **🎁 Animated Incoming Gifts & GIFs**:
-  - Live gift notification banners with combo multipliers (`x5`, `x10`, `x50`).
-  - Total diamonds/coins calculation.
+- **⚡ Direct TikTok Webcast Ingestion**: Direct connection to official TikTok Webcast WebSocket endpoints (`piratetok-live-js`). 100% free with no third-party signing fees or EulerStream subscriptions.
+- **👁️ Live Viewers & Peak Tracker**: Real-time audience monitoring, peak viewer recording, and continuous 6-second polling sync.
+- **💖 Interactive Likes Velocity**: Live tap counter with heartbeat pulse animations.
+- **🎁 Smart Floating Gift Banners**:
+  - Compact floating banner pool (max 2 banners) that never obstructs your chat feed.
+  - Multiplier combo detection (`x5`, `x10`, `x50`).
+  - Total diamond/coin calculation.
   - Procedural sound chime alerts generated in real-time via Web Audio API (0 KB audio assets needed).
+- **📊 Live Analytics & Top Gifters Leaderboard**:
+  - Live session summary: Stream duration, peak viewers, average viewers, total diamonds, and total likes.
+  - **Top 5 Donors Leaderboard** ranked in real-time.
+  - **1-Click Data Export**: Download complete session reports in **CSV** or **JSON** format.
 - **💬 Real-Time Live Chat Stream**:
-  - Clean Poppins typography designed for high stream visibility.
-  - User avatars and role badges (**MOD**, **SUB**).
-  - One-click **Pin Message** to keep critical comments pinned at the top.
-  - Instant filters: *All*, *Questions Only (?)*, *Moderator Only*, and Live keyword search.
-- **🗣️ Text-To-Speech (TTS)**: Built-in voice announcements for incoming gifts and stream milestones.
-- **📱 Multi-Device LAN Second-Screen Mode**:
-  - Run as a standalone desktop app or open on your smartphone, tablet, or second computer via local Wi-Fi.
-- **🛡️ Complex Yet Secure Architecture**:
-  - Strict HTML sanitization and XSS prevention.
-  - Electron Context Isolation & Content Security Policy (CSP).
-  - Auto-reconnect with exponential backoff on network hiccups.
+  - Clean Poppins typography with adjustable text sizes (**Small**, **Normal**, **Large**).
+  - One-click **Clear Chat Feed** button to refresh the screen without resetting session statistics.
+  - One-click **Pin Message** bar.
+  - Built-in **Bad Words Moderation Filter** with automatic `***` masking.
+  - Filter pills (*All*, *Gifts Only*) and instant search.
+- **🎬 OBS Studio Integration**:
+  - **Transparent Chat Overlay (`http://localhost:3000/overlay`)**: High-contrast, transparent background, auto-fading overlay for OBS Browser Source.
+  - **OBS Custom Browser Dock (`http://localhost:3000`)**: Embed the complete interactive monitor dock directly into your OBS Studio window.
+- **📥 System Tray & Background Ingestion**:
+  - Minimize or hide to System Tray on close.
+  - Background audio, TTS, and WebSocket streams run at 100% full speed with `backgroundThrottling: false`.
+- **🗣️ Text-To-Speech (TTS)**: Built-in voice synthesizer announcing donor names and gifts.
+- **📱 Multi-Device LAN Monitoring**: Automatically detects local host IP for monitoring from mobile phones or tablets on the same Wi-Fi.
+- **🛡️ Hardened Security**: Electron Context Isolation, strict Renderer Sandbox (`sandbox: true`), external navigation guard (`shell.openExternal`), and robust XSS sanitization.
 - **🎮 Built-In Demo Mode**: Simulate realistic live traffic, gifts, and chats with 1 click to test your layout anytime.
-
----
-
-## 🏗️ Architecture
-
-```
-┌────────────────────────────────────────────────────────┐
-│                   TikTok Live Stream                   │
-└───────────────────────────┬────────────────────────────┘
-                            │ Webcast Protobuf Stream
-┌───────────────────────────▼────────────────────────────┐
-│              strechat Core Backend (Node.js)           │
-│  - tiktok-live-connector v2                            │
-│  - Event Normalizer & Input Sanitizer (XSS protection) │
-│  - Resilience & Exponential Backoff Reconnector        │
-└─────────────┬───────────────────────────┬──────────────┘
-              │ Local WebSocket (/ws)     │ HTTP REST API
-┌─────────────▼───────────────────────────▼──────────────┐
-│                  Presentation Layer                    │
-│  ┌─────────────────────────┐  ┌──────────────────────┐ │
-│  │ Electron Native Window  │  │ Mobile/LAN Web View  │ │
-│  │ (Frameless, AlwaysOnTop)│  │ (Phone, Tablet, OBS) │ │
-│  └─────────────────────────┘  └──────────────────────┘ │
-│  - Minimalist Poppins UI        - Synthesized Audio   │
-│  - 60 FPS Spring Animations     - Web Speech TTS      │
-└────────────────────────────────────────────────────────┘
-```
 
 ---
 
@@ -65,34 +46,57 @@
 
 ### Prerequisites
 - Node.js v18.0.0 or higher
-- npm or pnpm
+- npm
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/your-username/strechat.git
-cd strechat
+git clone https://github.com/Juanndnich/Strechat.git
+cd Strechat
 npm install
 ```
 
-### 2. Run Desktop Application
+### 2. Run Automated Unit Tests
+```bash
+npm test
+```
+
+### 3. Run Desktop Application
 ```bash
 npm start
 ```
 
-### 3. Run Web / Headless Server (For browser or LAN access)
+### 4. Run Web / Headless Server (For Browser or LAN Access)
 ```bash
 npm run server
 ```
-Then open `http://localhost:3000` in any browser or on your phone using your computer's local IP address displayed in the console.
+Then open `http://localhost:3000` in any browser or on your mobile device via the LAN IP displayed in the terminal.
 
 ---
 
-## 🛠️ Building Standalone Binaries for GitHub Releases
+## 🎥 OBS Studio Integration Guide
 
-You can package `strechat` into native desktop installers and portable executables:
+### A. Transparent Chat Overlay (Browser Source)
+1. In OBS Studio, go to your **Sources** panel and click **+** -> **Browser**.
+2. Name it `Strechat Overlay`.
+3. Set **URL** to: `http://localhost:3000/overlay`
+4. Set **Width**: `480`, **Height**: `720` (or adjust to fit your scene).
+5. Check **Shutdown source when not visible** (optional).
+6. Click **OK**. Transparent chat bubbles with high-contrast text outlines will float cleanly over your gameplay.
+
+### B. Custom Browser Dock (Panel inside OBS)
+1. In OBS Studio, open the top menu: **Docks** -> **Custom Browser Docks...**
+2. In **Dock Name**, enter: `Strechat Monitor`
+3. In **URL**, enter: `http://localhost:3000`
+4. Click **Apply**. Dock the panel anywhere in your OBS workspace.
+
+---
+
+## 🛠️ Building Standalone Installers
+
+Package `strechat` into native desktop installers and portable executables:
 
 ```bash
-# Build for Windows (.exe installer & portable)
+# Build for Windows (.exe NSIS installer & portable)
 npm run dist:win
 
 # Build for macOS (.dmg & .zip)
@@ -102,27 +106,7 @@ npm run dist:mac
 npm run dist:linux
 ```
 
-Output files will be generated in the `dist/` directory ready for deployment.
-
----
-
-## 🚀 Publishing to GitHub Releases
-
-1. **Commit and push your changes**:
-   ```bash
-   git add .
-   git commit -m "feat: initial release v1.0.0"
-   git remote add origin https://github.com/your-username/strechat.git
-   git push -u origin main
-   ```
-
-2. **Create and push a release tag**:
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
-
-3. The automated **GitHub Actions Workflow** (`.github/workflows/build-release.yml`) will automatically compile the Windows, Mac, and Linux executables and create a published release under your repository's Releases tab.
+Output files are generated in the `dist/` directory.
 
 ---
 

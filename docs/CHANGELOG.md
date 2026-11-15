@@ -4,6 +4,11 @@ Semua perubahan penting pada proyek Strechat didokumentasikan di berkas ini.
 
 ## [1.0.0] - 2026-11-15
 
+### Release Preparation & CI/CD (P5)
+- **CI/CD Test Automation:** Menambahkan tahap eksekusi pengujian otomatis `npm test` pada alur kerja GitHub Actions `.github/workflows/build-release.yml`.
+- **Repository Metadata Sync:** Menyelaraskan URL repositori resmi pada `package.json` ke `https://github.com/Juanndnich/Strechat.git`.
+- **Comprehensive Bilingual Guides:** Memperbarui panduan instalasi, panduan OBS Overlay, dan OBS Custom Browser Dock pada `README.md` dan `README_ID.md`.
+
 ### Live Analytics & Data Export (P4)
 - **Live Session Service:** Menambahkan `src/server/sessionService.js` untuk pelacakan metrik sesi real-time (durasi, peak viewers, dan rata-rata penonton).
 - **Top Donatur Leaderboard:** Menghitung dan meranking donatur teratas (*Top 5 Gifters*) secara live berdasarkan diamond yang dikirimkan.
