@@ -116,13 +116,46 @@ function startServer(port = 3000, host = '0.0.0.0') {
   });
 }
 
+async function stopServer() {
+  try {
+    await tikTokService.disconnect();
+  } catch (e) {}
+
+  websocketHandler.close();
+
+  return new Promise((resolve) => {
+    if (server && server.listening) {
+      server.close((err) => {
+        if (err) console.warn('[strechat] Peringatan saat menutup HTTP server:', err.message);
+        resolve();
+      });
+      if (typeof server.closeAllConnections === 'function') {
+        server.closeAllConnections();
+      }
+      setTimeout(() => resolve(), 1200);
+    } else {
+      resolve();
+    }
+  });
+}
+
 module.exports = {
   app,
   server,
-  startServer
+  startServer,
+  stopServer
 };
 
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   startServer(PORT);
+
+  const handleTermination = async (signal) => {
+    console.log(`[strechat] Menerima sinyal ${signal}, menghentikan server dengan aman...`);
+    await stopServer();
+    process.exit(0);
+  };
+
+  process.on('SIGINT', () => handleTermination('SIGINT'));
+  process.on('SIGTERM', () => handleTermination('SIGTERM'));
 }

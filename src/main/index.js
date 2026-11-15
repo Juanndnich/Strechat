@@ -5,12 +5,11 @@
 
 const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
-const { startServer } = require('../server/app');
-const tikTokService = require('../server/tiktokService');
+const { startServer, stopServer } = require('../server/app');
 
 let mainWindow = null;
-let serverInstance = null;
 let serverPort = 3000;
+let isShuttingDown = false;
 
 // Enforce single instance lock
 const gotTheLock = app.requestSingleInstanceLock();
@@ -38,13 +37,45 @@ async function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     },
     show: false
   });
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+  });
+
+  // Strict Navigation Security: Intercept window.open / target="_blank"
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      try {
+        const parsed = new URL(url);
+        const localOrigin = `http://localhost:${serverPort}`;
+        if (parsed.origin !== new URL(localOrigin).origin) {
+          shell.openExternal(url);
+        }
+      } catch (e) {
+        shell.openExternal(url);
+      }
+    }
+    return { action: 'deny' };
+  });
+
+  // Strict Navigation Security: Intercept in-window navigation
+  mainWindow.webContents.on('will-navigate', (event, navigationUrl) => {
+    try {
+      const parsed = new URL(navigationUrl);
+      const localOrigin = `http://localhost:${serverPort}`;
+      if (parsed.origin !== new URL(localOrigin).origin) {
+        event.preventDefault();
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+          shell.openExternal(navigationUrl);
+        }
+      }
+    } catch (e) {
+      event.preventDefault();
+    }
   });
 
   // Load the running local server URL
@@ -87,11 +118,27 @@ ipcMain.on('window-pin', (_event, flag) => {
   }
 });
 
-ipcMain.on('open-external', (_event, url) => {
-  if (typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'))) {
-    shell.openExternal(url);
+ipcMain.on('open-external', (_event, targetUrl) => {
+  if (typeof targetUrl === 'string') {
+    try {
+      const parsed = new URL(targetUrl);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        shell.openExternal(targetUrl);
+      }
+    } catch (e) {}
   }
 });
+
+async function shutdownApp() {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  try {
+    await stopServer();
+  } catch (err) {
+    console.warn('[strechat] Peringatan saat shutdown server:', err.message);
+  }
+}
 
 app.whenReady().then(async () => {
   try {
@@ -111,16 +158,16 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', async () => {
-  try {
-    await tikTokService.disconnect();
-  } catch (e) {}
   if (process.platform !== 'darwin') {
+    await shutdownApp();
     app.quit();
   }
 });
 
-app.on('before-quit', async () => {
-  try {
-    await tikTokService.disconnect();
-  } catch (e) {}
+app.on('before-quit', async (event) => {
+  if (!isShuttingDown) {
+    event.preventDefault();
+    await shutdownApp();
+    app.quit();
+  }
 });

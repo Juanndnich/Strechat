@@ -768,17 +768,21 @@
       });
     }
 
-    // Sound and TTS toggles
+    // Sound and TTS toggles with persistence
     el.settingSound.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
       if (window.soundEngine) {
-        window.soundEngine.enabled = e.target.checked;
+        window.soundEngine.enabled = isChecked;
       }
+      saveSettings({ soundEnabled: isChecked });
     });
 
     el.settingTts.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
       if (window.ttsEngine) {
-        window.ttsEngine.enabled = e.target.checked;
+        window.ttsEngine.enabled = isChecked;
       }
+      saveSettings({ ttsEnabled: isChecked });
     });
 
     // Window controls (Electron Native & Browser Fallback)
@@ -828,10 +832,53 @@
     }
   }
 
+  // Settings Persistence Helper with safe error handling and defaults
+  const SETTINGS_KEY = 'strechat_settings';
+  const DEFAULT_SETTINGS = {
+    soundEnabled: true,
+    ttsEnabled: false
+  };
+
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      if (!raw) return { ...DEFAULT_SETTINGS };
+      const parsed = JSON.parse(raw);
+      return {
+        soundEnabled: typeof parsed?.soundEnabled === 'boolean' ? parsed.soundEnabled : DEFAULT_SETTINGS.soundEnabled,
+        ttsEnabled: typeof parsed?.ttsEnabled === 'boolean' ? parsed.ttsEnabled : DEFAULT_SETTINGS.ttsEnabled
+      };
+    } catch (e) {
+      console.warn('[strechat] Gagal membaca pengaturan dari localStorage, menggunakan default:', e);
+      return { ...DEFAULT_SETTINGS };
+    }
+  }
+
+  function saveSettings(partial) {
+    try {
+      const current = loadSettings();
+      const updated = { ...current, ...partial };
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.warn('[strechat] Gagal menyimpan pengaturan ke localStorage:', e);
+    }
+  }
+
   // Init
   function init() {
     const savedTheme = localStorage.getItem('strechat_theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
+
+    // Restore settings
+    const settings = loadSettings();
+    if (el.settingSound) {
+      el.settingSound.checked = settings.soundEnabled;
+      if (window.soundEngine) window.soundEngine.enabled = settings.soundEnabled;
+    }
+    if (el.settingTts) {
+      el.settingTts.checked = settings.ttsEnabled;
+      if (window.ttsEngine) window.ttsEngine.enabled = settings.ttsEnabled;
+    }
 
     setupEventListeners();
     initWebSocket();

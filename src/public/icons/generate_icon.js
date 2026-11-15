@@ -109,3 +109,33 @@ function createPng(width, height) {
 const iconBuf = createPng(256, 256);
 fs.writeFileSync(path.join(__dirname, 'icon.png'), iconBuf);
 console.log('icon.png generated successfully, size:', iconBuf.length, 'bytes');
+
+// Generate multi-size icon.ico for Windows
+const sizes = [16, 24, 32, 48, 64, 128, 256];
+const images = sizes.map(s => ({ size: s, buf: createPng(s, s) }));
+
+const header = Buffer.alloc(6);
+header.writeUInt16LE(0, 0); // reserved
+header.writeUInt16LE(1, 2); // ICO
+header.writeUInt16LE(images.length, 4); // count
+
+const dirEntries = [];
+let offset = 6 + (16 * images.length);
+
+for (const img of images) {
+  const entry = Buffer.alloc(16);
+  entry[0] = img.size === 256 ? 0 : img.size; // width (0 = 256)
+  entry[1] = img.size === 256 ? 0 : img.size; // height (0 = 256)
+  entry[2] = 0; // color palette
+  entry[3] = 0; // reserved
+  entry.writeUInt16LE(1, 4); // color planes
+  entry.writeUInt16LE(32, 6); // bits per pixel
+  entry.writeUInt32LE(img.buf.length, 8); // size
+  entry.writeUInt32LE(offset, 12); // offset
+  dirEntries.push(entry);
+  offset += img.buf.length;
+}
+
+const icoBuffer = Buffer.concat([header, ...dirEntries, ...images.map(img => img.buf)]);
+fs.writeFileSync(path.join(__dirname, 'icon.ico'), icoBuffer);
+console.log('icon.ico generated successfully, size:', icoBuffer.length, 'bytes');

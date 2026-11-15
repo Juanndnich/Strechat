@@ -23,6 +23,7 @@
     "start": "electron .",
     "server": "node src/server/app.js",
     "dev": "electron .",
+    "test": "node --test test/**/*.test.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist:win": "electron-builder --win",
@@ -45,7 +46,7 @@
         "nsis",
         "portable"
       ],
-      "icon": "src/public/icons/icon.png"
+      "icon": "src/public/icons/icon.ico"
     },
     "mac": {
       "target": [

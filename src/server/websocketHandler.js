@@ -10,9 +10,14 @@ class WebSocketHandler {
   constructor() {
     this.wss = null;
     this.clients = new Set();
+    this._eventsBound = false;
   }
 
   initialize(httpServer) {
+    if (this.wss) {
+      this.close();
+    }
+
     this.wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 
     this.wss.on('connection', (ws, req) => {
@@ -45,7 +50,10 @@ class WebSocketHandler {
       });
     });
 
-    this._bindServiceEvents();
+    if (!this._eventsBound) {
+      this._bindServiceEvents();
+      this._eventsBound = true;
+    }
   }
 
   _bindServiceEvents() {
@@ -122,6 +130,22 @@ class WebSocketHandler {
       if (client.readyState === 1) {
         client.send(payload);
       }
+    }
+  }
+
+  close() {
+    for (const client of this.clients) {
+      try {
+        client.terminate();
+      } catch (e) {}
+    }
+    this.clients.clear();
+
+    if (this.wss) {
+      try {
+        this.wss.close();
+      } catch (e) {}
+      this.wss = null;
     }
   }
 }
