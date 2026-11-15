@@ -1,6 +1,6 @@
 /**
  * strechat - TikTok Live Connector Service
- * Direct Webcast WebSocket connection with continuous live stat polling and zero third-party fees.
+ * Direct Webcast WebSocket connection with resilient connection lifecycle and continuous live sync.
  */
 
 const EventEmitter = require('events');
@@ -17,6 +17,7 @@ class TikTokLiveService extends EventEmitter {
     this.maxReconnectAttempts = 5;
     this.reconnectTimer = null;
     this.syncTimer = null;
+    this.graceTimer = null;
     this.isManualDisconnect = false;
 
     // Session Statistics
@@ -91,6 +92,7 @@ class TikTokLiveService extends EventEmitter {
           const errMsg = this._formatErrorMessage(err);
           this.status = 'DISCONNECTED';
           clearInterval(this.syncTimer);
+          clearTimeout(this.graceTimer);
           this.emit('status', this.getStatus());
           this.emit('error', {
             message: errMsg,
@@ -103,6 +105,7 @@ class TikTokLiveService extends EventEmitter {
     } catch (err) {
       this.status = 'DISCONNECTED';
       clearInterval(this.syncTimer);
+      clearTimeout(this.graceTimer);
       const errMsg = this._formatErrorMessage(err);
       this.emit('status', this.getStatus());
       this.emit('error', {
@@ -130,11 +133,28 @@ class TikTokLiveService extends EventEmitter {
   _bindClientEvents(EventType, fetchRoomInfo) {
     if (!this.client) return;
 
+    // Helper: Mark stream active whenever any packet or event arrives
+    const markAlive = () => {
+      clearTimeout(this.graceTimer);
+      if (this.status !== 'CONNECTED' && !this.isManualDisconnect) {
+        this.status = 'CONNECTED';
+        if (!this.stats.connectedAt) {
+          this.stats.connectedAt = Date.now();
+        }
+        this.emit('connected', {
+          uniqueId: this.uniqueId,
+          roomId: this.stats.roomId,
+          status: this.status
+        });
+        this.emit('status', this.getStatus());
+      }
+    };
+
     // Connection opened
     this.client.on(EventType.connected, async (data) => {
       this.status = 'CONNECTED';
       this.reconnectAttempts = 0;
-      this.stats.connectedAt = Date.now();
+      this.stats.connectedAt = this.stats.connectedAt || Date.now();
       this.stats.roomId = data?.roomId || null;
 
       // Seed initial room statistics (viewers & likes) immediately
@@ -201,6 +221,7 @@ class TikTokLiveService extends EventEmitter {
 
     // Chat Message
     this.client.on(EventType.chat, (data) => {
+      markAlive();
       this.stats.totalComments++;
       const user = data?.user || {};
       const uniqueId = cleanUsername(user?.displayId || user?.nickname || 'user');
@@ -235,6 +256,7 @@ class TikTokLiveService extends EventEmitter {
 
     // Gift Message
     this.client.on(EventType.gift, (data) => {
+      markAlive();
       const giftData = data?.gift || {};
       const user = data?.user || {};
       const repeatCount = Math.max(1, Number(data?.repeatCount || data?.comboCount || 1));
@@ -282,6 +304,7 @@ class TikTokLiveService extends EventEmitter {
 
     // Likes
     this.client.on(EventType.like, (data) => {
+      markAlive();
       const addedLikes = Number(data?.count || 1);
       this.stats.sessionLikes += addedLikes;
       const currentTotal = Number(data?.total || 0);
@@ -306,6 +329,7 @@ class TikTokLiveService extends EventEmitter {
 
     // Room User Seq (Viewers)
     this.client.on(EventType.roomUserSeq, (data) => {
+      markAlive();
       const count = Number(data?.viewerCount ?? data?.totalUser ?? data?.total ?? data?.popularity ?? 0);
       if (count > 0) {
         this.stats.viewerCount = count;
@@ -322,10 +346,23 @@ class TikTokLiveService extends EventEmitter {
       }
     });
 
-    // Stream Ended
+    // Reconnecting event from client's internal supervisor
+    this.client.on(EventType.reconnecting, (info) => {
+      if (!this.isManualDisconnect) {
+        this.status = 'RECONNECTING';
+        this.emit('reconnecting', {
+          attempt: info?.attempt || 1,
+          maxAttempts: info?.maxRetries || 5
+        });
+        this.emit('status', this.getStatus());
+      }
+    });
+
+    // Stream Ended by Host
     this.client.on(EventType.liveEnded, () => {
       this.status = 'DISCONNECTED';
       clearInterval(this.syncTimer);
+      clearTimeout(this.graceTimer);
       this.emit('streamEnd', {
         message: 'Live stream telah berakhir oleh host.',
         stats: this.stats
@@ -333,14 +370,23 @@ class TikTokLiveService extends EventEmitter {
       this.emit('status', this.getStatus());
     });
 
-    // Disconnected
+    // Disconnected (Graceful handling: do not drop UI if client is reconnecting in background)
     this.client.on(EventType.disconnected, () => {
-      clearInterval(this.syncTimer);
-      if (!this.isManualDisconnect && this.status === 'CONNECTED') {
-        this._handleAutoReconnect();
-      } else {
+      if (this.isManualDisconnect) {
+        clearInterval(this.syncTimer);
+        clearTimeout(this.graceTimer);
         this.status = 'DISCONNECTED';
         this.emit('status', this.getStatus());
+      } else {
+        // Give a 6-second grace period: supervisor loop is likely rotating the socket
+        clearTimeout(this.graceTimer);
+        this.graceTimer = setTimeout(() => {
+          if (!this.isManualDisconnect && this.status !== 'CONNECTED') {
+            clearInterval(this.syncTimer);
+            this.status = 'DISCONNECTED';
+            this.emit('status', this.getStatus());
+          }
+        }, 6000);
       }
     });
 
@@ -354,42 +400,10 @@ class TikTokLiveService extends EventEmitter {
     });
   }
 
-  _handleAutoReconnect() {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      this.status = 'DISCONNECTED';
-      clearInterval(this.syncTimer);
-      this.emit('status', this.getStatus());
-      this.emit('error', {
-        message: 'Koneksi terputus dan percobaan sambung ulang maksimal tercapai.',
-        detail: 'Max reconnect attempts exceeded'
-      });
-      return;
-    }
-
-    this.reconnectAttempts++;
-    this.status = 'RECONNECTING';
-    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 10000);
-
-    this.emit('reconnecting', {
-      attempt: this.reconnectAttempts,
-      maxAttempts: this.maxReconnectAttempts,
-      delayMs: delay
-    });
-    this.emit('status', this.getStatus());
-
-    clearTimeout(this.reconnectTimer);
-    this.reconnectTimer = setTimeout(async () => {
-      try {
-        if (this.uniqueId && !this.isManualDisconnect) {
-          await this.connect(this.uniqueId, this.options);
-        }
-      } catch (err) {}
-    }, delay);
-  }
-
   async disconnect() {
     this.isManualDisconnect = true;
     clearTimeout(this.reconnectTimer);
+    clearTimeout(this.graceTimer);
     clearInterval(this.syncTimer);
 
     if (this.client) {

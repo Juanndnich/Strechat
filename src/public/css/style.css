@@ -423,94 +423,121 @@ body {
   pointer-events: none;
 }
 
-/* Gift Banner Announcement Area */
+/* Gift Banner Floating Notification Area (Non-intrusive overlay) */
 .gift-banner-area {
-  padding: 8px 16px 0 16px;
+  position: absolute;
+  top: 195px;
+  left: 16px;
+  right: 16px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   pointer-events: none;
+  z-index: 60;
+  max-height: 80px;
+  overflow: hidden;
 }
 
 .gift-banner {
   pointer-events: auto;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(244, 63, 94, 0.15));
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  border-radius: var(--radius-md);
-  padding: 8px 12px;
+  background: rgba(18, 20, 30, 0.94);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2);
-  animation: giftPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(245, 158, 11, 0.15);
+  animation: giftPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .gift-banner-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .gift-avatar {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 2px solid var(--accent-amber);
+  border: 1.5px solid var(--accent-amber);
   object-fit: cover;
 }
 
 .gift-avatar-placeholder {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f59e0b, #f43f5e);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
 .gift-info {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
 }
 
 .gift-sender {
-  font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .gift-desc {
-  font-size: 11px;
   color: var(--text-secondary);
+}
+
+.gift-desc strong {
+  color: var(--accent-amber);
 }
 
 .gift-banner-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .gift-combo-badge {
   background: linear-gradient(135deg, #f59e0b, #ef4444);
   color: #fff;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 12px;
   font-style: italic;
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: var(--radius-full);
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-  animation: heartBeat 0.5s infinite alternate;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
 }
 
 .gift-icon-img {
-  width: 36px;
-  height: 36px;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
+}
+
+/* Inline Gift in Chat Feed */
+.chat-item.chat-item-gift {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-sm);
+}
+
+.badge-gift {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.chat-text.gift-highlight {
+  color: #fbbf24;
+  font-weight: 500;
 }
 
 /* Pinned Comment Box */

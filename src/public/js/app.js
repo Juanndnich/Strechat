@@ -191,18 +191,34 @@
         break;
 
       case 'chat':
+        if (!state.connected && !state.isDemo) {
+          state.connected = true;
+          setUIConnectedState(true);
+        }
         renderChatMessage(data);
         break;
 
       case 'gift':
+        if (!state.connected && !state.isDemo) {
+          state.connected = true;
+          setUIConnectedState(true);
+        }
         handleGiftEvent(data);
         break;
 
       case 'like':
+        if (!state.connected && !state.isDemo) {
+          state.connected = true;
+          setUIConnectedState(true);
+        }
         handleLikeEvent(data);
         break;
 
       case 'viewers':
+        if (!state.connected && !state.isDemo) {
+          state.connected = true;
+          setUIConnectedState(true);
+        }
         state.stats.viewerCount = data.viewerCount;
         state.stats.peakViewers = data.peakViewers;
         el.metricViewers.textContent = formatNumber(data.viewerCount);
@@ -211,6 +227,10 @@
 
       case 'stats_update':
         if (data && data.stats) {
+          if (!state.connected && !state.isDemo && data.status === 'CONNECTED') {
+            state.connected = true;
+            setUIConnectedState(true);
+          }
           syncStats(data.stats);
         }
         break;
@@ -372,7 +392,7 @@
     }
   }
 
-  // Gift Event & Floating Banner
+  // Gift Event & Smart Floating Banner (Max 2 Banners + Inline Chat Entry)
   function handleGiftEvent(data) {
     const gift = data.gift;
     const diamonds = gift.diamondCount * (data.repeatEnd ? data.repeatCount : 1);
@@ -392,44 +412,130 @@
       window.ttsEngine.speakGift(data.nickname, gift.giftName, data.repeatCount);
     }
 
-    // Gift Banner Popup
-    const banner = document.createElement('div');
-    banner.className = 'gift-banner';
+    // Render into chat feed as a stylish gift row
+    if (data.repeatEnd || data.repeatCount === 1) {
+      renderInlineGift(data, diamonds);
+    }
 
-    let avatarSrc = data.profilePictureUrl && data.profilePictureUrl.startsWith('http')
-      ? `<img class="gift-avatar" src="${data.profilePictureUrl}" alt="${data.nickname}">`
-      : `<div class="gift-avatar-placeholder">${data.nickname.charAt(0).toUpperCase()}</div>`;
+    // Floating Banner Pooling: Update existing combo or show max 2 compact banners
+    const giftKey = `${data.uniqueId || data.nickname}_${gift.giftName}`;
+    const existing = el.giftBannerArea.querySelector(`[data-gift-key="${giftKey}"]`);
 
-    let giftImg = gift.giftPictureUrl
-      ? `<img class="gift-icon-img" src="${gift.giftPictureUrl}" alt="${gift.giftName}">`
-      : `<svg class="gift-icon-img" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>`;
+    if (existing) {
+      const badge = existing.querySelector('.gift-combo-badge');
+      if (badge) {
+        badge.textContent = `x${data.repeatCount}`;
+        badge.classList.remove('heart-pulse');
+        void badge.offsetWidth;
+        badge.classList.add('heart-pulse');
+      }
+      const desc = existing.querySelector('.gift-desc');
+      if (desc) {
+        desc.innerHTML = `Mengirim <strong>${gift.giftName}</strong> (${diamonds} Diamond)`;
+      }
+      clearTimeout(existing._timer);
+      existing._timer = setTimeout(() => {
+        existing.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        existing.style.opacity = '0';
+        existing.style.transform = 'translateY(-6px)';
+        setTimeout(() => existing.remove(), 250);
+      }, 2500);
+    } else {
+      // Keep at most 2 banners in view to never cover chat
+      while (el.giftBannerArea.children.length >= 2) {
+        el.giftBannerArea.removeChild(el.giftBannerArea.firstElementChild);
+      }
 
-    const comboHtml = data.repeatCount > 1
-      ? `<span class="gift-combo-badge">x${data.repeatCount}</span>`
+      const banner = document.createElement('div');
+      banner.className = 'gift-banner';
+      banner.dataset.giftKey = giftKey;
+
+      let avatarSrc = data.profilePictureUrl && data.profilePictureUrl.startsWith('http')
+        ? `<img class="gift-avatar" src="${data.profilePictureUrl}" alt="${data.nickname}">`
+        : `<div class="gift-avatar-placeholder">${data.nickname.charAt(0).toUpperCase()}</div>`;
+
+      let giftImg = gift.giftPictureUrl
+        ? `<img class="gift-icon-img" src="${gift.giftPictureUrl}" alt="${gift.giftName}">`
+        : `<svg class="gift-icon-img" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>`;
+
+      const comboHtml = data.repeatCount > 1
+        ? `<span class="gift-combo-badge">x${data.repeatCount}</span>`
+        : '';
+
+      banner.innerHTML = `
+        <div class="gift-banner-left">
+          ${avatarSrc}
+          <div class="gift-info">
+            <span class="gift-sender">${data.nickname}</span>
+            <span class="gift-desc">Mengirim <strong>${gift.giftName}</strong> (${diamonds} Diamond)</span>
+          </div>
+        </div>
+        <div class="gift-banner-right">
+          ${giftImg}
+          ${comboHtml}
+        </div>
+      `;
+
+      el.giftBannerArea.appendChild(banner);
+
+      banner._timer = setTimeout(() => {
+        banner.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(-6px)';
+        setTimeout(() => banner.remove(), 250);
+      }, 2500);
+    }
+  }
+
+  // Render Compact Inline Gift Message in Main Chat Feed
+  function renderInlineGift(data, diamonds) {
+    if (el.chatEmpty) el.chatEmpty.style.display = 'none';
+
+    const item = document.createElement('div');
+    item.className = 'chat-item chat-item-gift';
+    item.dataset.id = data.id;
+    item.dataset.user = data.uniqueId;
+    item.dataset.isGift = 'true';
+    item.dataset.isQuestion = 'false';
+    item.dataset.isMod = 'false';
+
+    let avatarHtml = '';
+    if (data.profilePictureUrl && data.profilePictureUrl.startsWith('http')) {
+      avatarHtml = `<img class="chat-avatar" src="${data.profilePictureUrl}" alt="${data.nickname}">`;
+    } else {
+      avatarHtml = `<div class="chat-avatar-placeholder">${data.nickname.charAt(0).toUpperCase()}</div>`;
+    }
+
+    let giftImg = data.gift.giftPictureUrl
+      ? `<img src="${data.gift.giftPictureUrl}" style="width: 20px; height: 20px; vertical-align: middle; margin-left: 4px;" alt="">`
       : '';
 
-    banner.innerHTML = `
-      <div class="gift-banner-left">
-        ${avatarSrc}
-        <div class="gift-info">
-          <span class="gift-sender">${data.nickname}</span>
-          <span class="gift-desc">Mengirim <strong>${gift.giftName}</strong> (${diamonds} Diamond)</span>
+    const timeString = new Date(data.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+    item.innerHTML = `
+      ${avatarHtml}
+      <div class="chat-body">
+        <div class="chat-header">
+          <span class="chat-nickname">${data.nickname}</span>
+          <span class="badge-item badge-gift">GIFT</span>
+          <span class="chat-time">${timeString}</span>
         </div>
-      </div>
-      <div class="gift-banner-right">
-        ${giftImg}
-        ${comboHtml}
+        <div class="chat-text gift-highlight">
+          Mengirim <strong>${data.gift.giftName}</strong> (${diamonds} Diamond) ${data.repeatCount > 1 ? 'x' + data.repeatCount : ''} ${giftImg}
+        </div>
       </div>
     `;
 
-    el.giftBannerArea.appendChild(banner);
+    applyItemFilter(item);
+    el.chatContainer.appendChild(item);
 
-    setTimeout(() => {
-      banner.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-      banner.style.opacity = '0';
-      banner.style.transform = 'translateY(-10px)';
-      setTimeout(() => banner.remove(), 400);
-    }, 4500);
+    if (el.chatContainer.children.length > 300) {
+      el.chatContainer.removeChild(el.chatContainer.firstElementChild);
+    }
+
+    if (state.isAutoScroll) {
+      el.chatContainer.scrollTop = el.chatContainer.scrollHeight;
+    }
   }
 
   // Pin Message
@@ -449,9 +555,11 @@
   function applyItemFilter(item) {
     const isQuestion = item.dataset.isQuestion === 'true';
     const isMod = item.dataset.isMod === 'true';
+    const isGift = item.dataset.isGift === 'true';
     const text = item.textContent.toLowerCase();
 
     let matchesFilter = true;
+    if (state.filter === 'gifts' && !isGift) matchesFilter = false;
     if (state.filter === 'questions' && !isQuestion) matchesFilter = false;
     if (state.filter === 'mods' && !isMod) matchesFilter = false;
 
