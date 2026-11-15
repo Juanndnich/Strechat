@@ -651,7 +651,10 @@
                 <span style="font-size: 10px; color: var(--text-muted);">${g.giftCount}x gift</span>
               </div>
             </div>
-            <span style="font-weight: 700; font-size: 12px; color: var(--accent-amber);">${formatNumber(g.diamonds)} 💎</span>
+            <span style="font-weight: 700; font-size: 11px; color: var(--accent-amber); display: flex; align-items: center; gap: 4px;">
+              ${formatNumber(g.diamonds)}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 8.5 12 22 22 8.5 12 2"></polygon><line x1="2" y1="8.5" x2="22" y2="8.5"></line></svg>
+            </span>
           </div>
         `;
       }).join('');

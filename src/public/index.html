@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>strechat - TikTok Live Monitor</title>
+  <title>strechat — TikTok Live Monitor</title>
   <link rel="stylesheet" href="css/poppins.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -12,19 +12,20 @@
   <header class="titlebar" id="titlebar">
     <div class="titlebar-brand">
       <span class="brand-dot"></span>
-      <span>strechat</span>
+      <span class="brand-name">strechat</span>
+      <span class="brand-tag">v1.0.0</span>
     </div>
     <div class="titlebar-controls">
-      <button class="titlebar-btn" id="btn-pin" title="Selalu di Atas (Always on Top)">
+      <button class="titlebar-btn" id="btn-pin" title="Pin ke Atas (Always on Top)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v8M5 10h14M12 10l-4 12M12 10l4 12"/></svg>
       </button>
-      <button class="titlebar-btn" id="btn-min" title="Minimize">
+      <button class="titlebar-btn" id="btn-min" title="Kecilkan (Minimize)">
         <svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
       </button>
-      <button class="titlebar-btn" id="btn-max" title="Maximize">
+      <button class="titlebar-btn" id="btn-max" title="Perbesar (Maximize)">
         <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
       </button>
-      <button class="titlebar-btn btn-close" id="btn-close" title="Close">
+      <button class="titlebar-btn btn-close" id="btn-close" title="Tutup ke Tray">
         <svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
@@ -35,38 +36,41 @@
     <div class="connection-row">
       <div class="input-group">
         <span class="input-prefix">@</span>
-        <input type="text" id="channel-input" class="channel-input" placeholder="Username TikTok..." spellcheck="false" autocomplete="off">
+        <input type="text" id="channel-input" class="channel-input" placeholder="Username TikTok streamer..." spellcheck="false" autocomplete="off">
       </div>
       <button class="btn-primary" id="btn-connect">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        Mulai Pantau
+        <span>Mulai Pantau</span>
       </button>
-      <button class="btn-icon" id="btn-demo" title="Mode Demo / Simulasi">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-      </button>
-      <button class="btn-icon" id="btn-theme" title="Ganti Tema">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-      </button>
-      <button class="btn-icon" id="btn-analytics" title="Analitik & Top Donatur">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-      </button>
-      <button class="btn-icon" id="btn-settings" title="Pengaturan">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-      </button>
+
+      <div class="header-actions">
+        <button class="btn-icon" id="btn-demo" title="Mode Demo / Simulasi">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        </button>
+        <button class="btn-icon" id="btn-analytics" title="Analitik Sesi & Top Donatur">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        </button>
+        <button class="btn-icon" id="btn-theme" title="Ganti Tema Gelap / Terang">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="btn-icon" id="btn-settings" title="Pengaturan Aplikasi">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
     </div>
 
     <!-- Status Sub-bar -->
     <div class="status-bar">
       <div class="status-indicator">
         <span class="status-dot disconnected" id="status-dot"></span>
-        <span id="status-text">Siap memantau</span>
+        <span id="status-text">Siap memantau live</span>
       </div>
       <div class="status-meta">
-        <span title="Durasi Terhubung" style="display: flex; align-items: center; gap: 4px;">
+        <span class="meta-item" title="Durasi Terhubung">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           <span id="status-uptime">00:00</span>
         </span>
-        <span title="Latensi WebSocket" style="display: flex; align-items: center; gap: 4px;">
+        <span class="meta-item" title="Latensi WebSocket">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
           <span id="status-ping">0ms</span>
         </span>
@@ -74,15 +78,17 @@
     </div>
   </section>
 
-  <!-- Real-Time Metrics KPI Grid -->
+  <!-- Sleek Statistics Strip (Minimalist & Compact) -->
   <section class="metrics-grid">
     <div class="metric-card viewers">
       <div class="metric-header">
         <span>Penonton</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
       </div>
-      <div class="metric-value" id="metric-viewers">0</div>
-      <div class="metric-sub" id="metric-peak">Puncak: 0</div>
+      <div class="metric-value-wrap">
+        <span class="metric-value" id="metric-viewers">0</span>
+        <span class="metric-sub" id="metric-peak">Puncak: 0</span>
+      </div>
     </div>
 
     <div class="metric-card likes">
@@ -90,34 +96,40 @@
         <span>Suka</span>
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       </div>
-      <div class="metric-value" id="metric-likes">0</div>
-      <div class="metric-sub">Total live tap</div>
+      <div class="metric-value-wrap">
+        <span class="metric-value" id="metric-likes">0</span>
+        <span class="metric-sub">Total live tap</span>
+      </div>
     </div>
 
     <div class="metric-card diamonds">
       <div class="metric-header">
         <span>Diamond</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 8.5 12 22 22 8.5 12 2"></polygon><line x1="2" y1="8.5" x2="22" y2="8.5"></line><line x1="12" y1="2" x2="7 8.5"></line><line x1="12" y1="2" x2="17 8.5"></line><line x1="12" y1="22" x2="7 8.5"></line><line x1="12" y1="22" x2="17 8.5"></line></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 8.5 12 22 22 8.5 12 2"></polygon><line x1="2" y1="8.5" x2="22" y2="8.5"></line><line x1="12" y1="2" x2="7 8.5"></line><line x1="12" y1="2" x2="17 8.5"></line><line x1="12" y1="22" x2="7 8.5"></line><line x1="12" y1="22" x2="17 8.5"></line></svg>
       </div>
-      <div class="metric-value" id="metric-diamonds">0</div>
-      <div class="metric-sub">Nilai gift</div>
+      <div class="metric-value-wrap">
+        <span class="metric-value" id="metric-diamonds">0</span>
+        <span class="metric-sub">Nilai gift</span>
+      </div>
     </div>
 
     <div class="metric-card comments">
       <div class="metric-header">
         <span>Komentar</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
       </div>
-      <div class="metric-value" id="metric-comments">0</div>
-      <div class="metric-sub">Total obrolan</div>
+      <div class="metric-value-wrap">
+        <span class="metric-value" id="metric-comments">0</span>
+        <span class="metric-sub">Total obrolan</span>
+      </div>
     </div>
   </section>
 
-  <!-- Filter and Search Row -->
+  <!-- Filter & Chat Search Toolbar -->
   <div class="filter-bar">
     <div class="filter-pills">
       <button class="pill-btn active" data-filter="all">Semua</button>
-      <button class="pill-btn" data-filter="gifts" style="display: flex; align-items: center; gap: 4px;">
+      <button class="pill-btn" data-filter="gifts">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>
         Hanya Gift
       </button>
@@ -126,17 +138,17 @@
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <input type="text" id="chat-search-input" class="chat-search-input" placeholder="Cari komentar...">
     </div>
-    <button class="btn-clear-chat" id="btn-clear-chat" title="Bersihkan riwayat obrolan di layar" style="height: 26px; width: 26px; flex-shrink: 0;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+    <button class="btn-clear-chat" id="btn-clear-chat" title="Bersihkan riwayat obrolan di layar">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
     </button>
   </div>
 
-  <!-- Floating Gift Banner Popups Area -->
+  <!-- Floating Gift Banner Popups Area (Max 2 banners) -->
   <div class="gift-banner-area" id="gift-banner-area"></div>
 
   <!-- Pinned Comment Bar -->
   <div class="pinned-container" id="pinned-container" style="display: none;">
-    <div>
+    <div class="pinned-body">
       <div class="pinned-badge">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>
         Pesan Disematkan
@@ -151,7 +163,7 @@
     </button>
   </div>
 
-  <!-- Main Live Chat Stream -->
+  <!-- Main Live Chat Stream (Primary Focus Area) -->
   <main class="chat-container" id="chat-container">
     <div class="chat-empty" id="chat-empty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
@@ -163,159 +175,213 @@
   <!-- Auto-scroll indicator button -->
   <button class="scroll-bottom-btn" id="btn-scroll-bottom" style="display: none;">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-    Pesan Baru
+    <span>Pesan Baru</span>
   </button>
 
-  <!-- Settings & Multi-Device Modal -->
+  <!-- Settings Modal (Categorized, Professional & Minimalist) -->
   <div class="modal-overlay" id="modal-settings">
     <div class="modal-card">
       <div class="modal-header">
-        <h2>Pengaturan strechat</h2>
-        <button class="titlebar-btn" id="btn-close-settings">
+        <div class="modal-header-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <h2>Pengaturan strechat</h2>
+        </div>
+        <button class="titlebar-btn" id="btn-close-settings" title="Tutup">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
+
       <div class="modal-body">
-        <div class="setting-item">
-          <div class="setting-label">
-            <span class="setting-title">Suara Notifikasi Gift</span>
-            <span class="setting-desc">Bunyikan nada lonceng saat menerima gift</span>
+        <!-- Category 1: Tampilan & Obrolan -->
+        <div class="settings-section">
+          <div class="section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            Tampilan & Obrolan
           </div>
-          <label class="switch">
-            <input type="checkbox" id="setting-sound" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-label">
-            <span class="setting-title">Text-to-Speech (TTS) Suara</span>
-            <span class="setting-desc">Bacakan nama pengirim dan jenis gift</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="setting-tts">
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="setting-item" style="border-top: 1px solid var(--border-subtle); padding-top: 12px; flex-direction: column; align-items: stretch; gap: 8px;">
-          <div class="setting-label">
-            <span class="setting-title">Ukuran Teks Obrolan</span>
-            <span class="setting-desc">Sesuaikan ukuran font pesan agar nyaman dibaca dari jarak jauh</span>
-          </div>
-          <div class="font-size-group" id="font-size-group" style="display: flex; gap: 6px;">
-            <button class="pill-btn font-size-btn active" data-size="normal" style="flex: 1; justify-content: center;">Normal</button>
-            <button class="pill-btn font-size-btn" data-size="small" style="flex: 1; justify-content: center;">Kecil</button>
-            <button class="pill-btn font-size-btn" data-size="large" style="flex: 1; justify-content: center;">Besar</button>
+          <div class="setting-item vertical">
+            <div class="setting-label">
+              <span class="setting-title">Ukuran Teks Obrolan</span>
+              <span class="setting-desc">Sesuaikan ukuran font pesan agar nyaman dibaca dari monitor utama atau jarak jauh.</span>
+            </div>
+            <div class="font-size-group" id="font-size-group">
+              <button class="pill-btn font-size-btn" data-size="small">Kecil</button>
+              <button class="pill-btn font-size-btn active" data-size="normal">Normal</button>
+              <button class="pill-btn font-size-btn" data-size="large">Besar</button>
+            </div>
           </div>
         </div>
 
-        <div class="setting-item" style="border-top: 1px solid var(--border-subtle); padding-top: 12px; flex-direction: column; align-items: stretch; gap: 8px;">
-          <div class="setting-label">
-            <span class="setting-title">Filter Kata Terlarang (Blacklist)</span>
-            <span class="setting-desc">Sensor kata kasar/spam otomatis (pisahkan dengan koma)</span>
+        <!-- Category 2: Suara & Text-to-Speech -->
+        <div class="settings-section">
+          <div class="section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            Suara & Text-to-Speech
           </div>
-          <input type="text" id="setting-blacklist" class="chat-search-input" style="width: 100%; border-radius: 8px; height: 30px; padding: 0 10px;" placeholder="Contoh: kasar, spam, judi">
-        </div>
-
-        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 8px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
-          <div class="setting-label">
-            <span class="setting-title">Overlay Transparan OBS (Browser Source)</span>
-            <span class="setting-desc">Tambahkan sebagai <strong>Browser Source</strong> di OBS untuk menampilkan chat melayang transparan di layar stream:</span>
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="setting-title">Suara Notifikasi Gift</span>
+              <span class="setting-desc">Bunyikan nada lonceng ceria saat menerima gift penonton.</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-sound" checked>
+              <span class="slider"></span>
+            </label>
           </div>
-          <div class="remote-link-box">
-            <span id="obs-overlay-url">http://localhost:3000/overlay</span>
-            <button class="btn-primary" id="btn-copy-overlay" style="height: 28px; padding: 0 10px; font-size: 11px;">Salin URL</button>
-          </div>
-        </div>
-
-        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
-          <div class="setting-label">
-            <span class="setting-title">OBS Dock (Tempel Panel di Jendela OBS)</span>
-            <span class="setting-desc">Di OBS Studio, buka menu <strong>Docks -> Custom Browser Docks...</strong>, masukkan URL berikut:</span>
-          </div>
-          <div class="remote-link-box">
-            <span id="obs-dock-url">http://localhost:3000</span>
-            <button class="btn-primary" id="btn-copy-dock" style="height: 28px; padding: 0 10px; font-size: 11px;">Salin URL</button>
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="setting-title">Text-to-Speech (TTS) Suara</span>
+              <span class="setting-desc">Bacakan otomatis nama pengirim dan jenis gift yang diterima.</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-tts">
+              <span class="slider"></span>
+            </label>
           </div>
         </div>
 
-        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 8px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
-          <div class="setting-label">
-            <span class="setting-title">Pantau Lewat HP / Tablet (Jaringan LAN)</span>
-            <span class="setting-desc">Buka tautan ini di browser ponsel atau tablet Anda di jaringan Wi-Fi yang sama:</span>
+        <!-- Category 3: Moderasi Obrolan -->
+        <div class="settings-section">
+          <div class="section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            Moderasi Obrolan
           </div>
-          <div class="remote-link-box">
-            <span id="remote-url-text">http://localhost:3000</span>
-            <button class="btn-primary" id="btn-copy-remote" style="height: 28px; padding: 0 10px; font-size: 11px;">Salin</button>
+          <div class="setting-item vertical">
+            <div class="setting-label">
+              <span class="setting-title">Filter Kata Terlarang (Blacklist)</span>
+              <span class="setting-desc">Sensor otomatis kata kasar/spam dengan tanda bintang (pisahkan dengan koma).</span>
+            </div>
+            <input type="text" id="setting-blacklist" class="setting-input" placeholder="Contoh: kasar, judi, promo">
           </div>
         </div>
 
-        <div class="setting-item" style="border-top: 1px solid var(--border-subtle); padding-top: 12px; justify-content: space-between;">
-          <div class="setting-label">
-            <span class="setting-title">Keluar dari Aplikasi</span>
-            <span class="setting-desc">Tutup jendela desktop strechat</span>
+        <!-- Category 4: Integrasi OBS Studio -->
+        <div class="settings-section">
+          <div class="section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+            Integrasi OBS Studio
           </div>
-          <button class="btn-primary btn-danger" id="btn-quit-app" style="height: 32px; padding: 0 14px; font-size: 12px;">
-            Keluar Aplikasi
-          </button>
+          <div class="setting-item vertical">
+            <div class="setting-label">
+              <span class="setting-title">Overlay Transparan OBS (Browser Source)</span>
+              <span class="setting-desc">Tambahkan sebagai <strong>Browser Source</strong> di OBS untuk menampilkan chat melayang di layar stream:</span>
+            </div>
+            <div class="remote-link-box">
+              <span id="obs-overlay-url">http://localhost:3000/overlay</span>
+              <button class="btn-copy-action" id="btn-copy-overlay">Salin URL</button>
+            </div>
+          </div>
+          <div class="setting-item vertical">
+            <div class="setting-label">
+              <span class="setting-title">OBS Dock (Tempel Panel di OBS Studio)</span>
+              <span class="setting-desc">Di OBS Studio, buka menu <strong>Docks -> Custom Browser Docks...</strong> lalu masukkan tautan ini:</span>
+            </div>
+            <div class="remote-link-box">
+              <span id="obs-dock-url">http://localhost:3000</span>
+              <button class="btn-copy-action" id="btn-copy-dock">Salin URL</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 5: Akses Jaringan LAN -->
+        <div class="settings-section">
+          <div class="section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            Akses Jarak Jauh (LAN Wi-Fi)
+          </div>
+          <div class="setting-item vertical">
+            <div class="setting-label">
+              <span class="setting-title">Pantau Lewat HP / Tablet</span>
+              <span class="setting-desc">Buka tautan ini di browser ponsel atau tablet Anda yang terhubung ke Wi-Fi yang sama:</span>
+            </div>
+            <div class="remote-link-box">
+              <span id="remote-url-text">http://localhost:3000</span>
+              <button class="btn-copy-action" id="btn-copy-remote">Salin URL</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category 6: Kontrol Aplikasi & Tentang -->
+        <div class="settings-section app-control-section">
+          <div class="app-info-row">
+            <span class="app-version-badge">strechat v1.0.0</span>
+            <span class="app-license-badge">Lisensi MIT — Open Source</span>
+          </div>
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="setting-title">Keluar dari Aplikasi</span>
+              <span class="setting-desc">Hentikan seluruh koneksi dan tutup aplikasi sepenuhnya.</span>
+            </div>
+            <button class="btn-danger" id="btn-quit-app">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              Keluar Aplikasi
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Analytics & Leaderboard Modal (P4) -->
+  <!-- Analytics & Leaderboard Modal (P4 Dedicated Panel) -->
   <div class="modal-overlay" id="modal-analytics">
-    <div class="modal-card" style="max-width: 480px;">
+    <div class="modal-card analytics-modal-card">
       <div class="modal-header">
-        <h2>Analitik Sesi Live & Top Donatur</h2>
-        <button class="titlebar-btn" id="btn-close-analytics">
+        <div class="modal-header-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          <h2>Analitik Sesi Live & Donatur</h2>
+        </div>
+        <button class="titlebar-btn" id="btn-close-analytics" title="Tutup">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
+
       <div class="modal-body">
-        <!-- Live Analytics Summary -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-          <div class="metric-card">
-            <span class="metric-header" style="font-size: 9px;">DURASI LIVE</span>
-            <span class="metric-value" id="analytics-duration" style="font-size: 15px;">00:00</span>
+        <!-- Live Analytics Summary KPI Cards -->
+        <div class="analytics-kpi-grid">
+          <div class="analytics-kpi-card">
+            <span class="kpi-label">DURASI LIVE</span>
+            <span class="kpi-value" id="analytics-duration">00:00</span>
           </div>
-          <div class="metric-card">
-            <span class="metric-header" style="font-size: 9px;">PEAK VIEWERS</span>
-            <span class="metric-value" id="analytics-peak" style="font-size: 15px;">0</span>
+          <div class="analytics-kpi-card">
+            <span class="kpi-label">PEAK VIEWERS</span>
+            <span class="kpi-value highlight-rose" id="analytics-peak">0</span>
           </div>
-          <div class="metric-card">
-            <span class="metric-header" style="font-size: 9px;">RATA-RATA</span>
-            <span class="metric-value" id="analytics-avg" style="font-size: 15px;">0</span>
+          <div class="analytics-kpi-card">
+            <span class="kpi-label">RATA-RATA</span>
+            <span class="kpi-value highlight-sky" id="analytics-avg">0</span>
           </div>
         </div>
 
         <!-- Top Donors Leaderboard -->
-        <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-            <span class="setting-title" style="display: flex; align-items: center; gap: 6px;">
+        <div class="leaderboard-section">
+          <div class="leaderboard-header">
+            <span class="section-title">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" color="var(--accent-amber)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               Top Donatur (Pemberi Gift)
             </span>
-            <span class="setting-desc" id="analytics-total-diamonds" style="color: var(--accent-amber); font-weight: 600;">0 Diamond</span>
+            <span class="total-diamonds-badge" id="analytics-total-diamonds">0 Diamond</span>
           </div>
-          <div class="leaderboard-list" id="leaderboard-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto;">
-            <div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 12px;">
+          <div class="leaderboard-list" id="leaderboard-list">
+            <div class="leaderboard-empty">
               Belum ada gift yang masuk pada sesi live ini.
             </div>
           </div>
         </div>
 
         <!-- Export Data Section -->
-        <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
-          <span class="setting-title">Ekspor Laporan Sesi Live</span>
-          <span class="setting-desc">Unduh rangkuman statistik, daftar donatur, dan riwayat obrolan:</span>
-          <div style="display: flex; gap: 8px;">
-            <a href="/api/session/export?format=csv" target="_blank" class="btn-primary" id="btn-export-csv" style="flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; height: 32px; font-size: 12px;">
+        <div class="export-section">
+          <div class="export-header">
+            <span class="section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Ekspor Laporan Sesi Live
+            </span>
+            <span class="setting-desc">Unduh rangkuman statistik lengkap dan riwayat donatur:</span>
+          </div>
+          <div class="export-actions">
+            <a href="/api/session/export?format=csv" target="_blank" class="btn-export" id="btn-export-csv">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
               Unduh CSV
             </a>
-            <a href="/api/session/export?format=json" target="_blank" class="btn-primary btn-secondary" id="btn-export-json" style="flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; height: 32px; font-size: 12px;">
+            <a href="/api/session/export?format=json" target="_blank" class="btn-export btn-export-secondary" id="btn-export-json">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
               Unduh JSON
             </a>
