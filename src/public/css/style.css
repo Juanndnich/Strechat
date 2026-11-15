@@ -55,17 +55,19 @@ body {
   user-select: none;
 }
 
-/* Custom Titlebar for Electron Desktop */
+/* Custom Titlebar for Electron Desktop & Draggable Window */
 .titlebar {
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: space-between;
-  height: 38px;
+  height: 42px;
   padding: 0 14px;
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-subtle);
   -webkit-app-region: drag;
-  z-index: 100;
+  user-select: none;
+  z-index: 9999;
+  position: relative;
 }
 
 .titlebar-brand {
@@ -76,6 +78,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.5px;
   color: var(--text-primary);
+  pointer-events: none;
 }
 
 .brand-dot {
@@ -88,37 +91,46 @@ body {
 .titlebar-controls {
   display: flex;
   align-items: center;
-  gap: 4px;
-  -webkit-app-region: no-drag;
+  gap: 6px;
+  -webkit-app-region: no-drag !important;
 }
 
 .titlebar-btn {
-  background: transparent;
-  border: none;
+  -webkit-app-region: no-drag !important;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .titlebar-btn:hover {
   background-color: var(--bg-card-hover);
   color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.titlebar-btn.btn-close {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #f43f5e;
 }
 
 .titlebar-btn.btn-close:hover {
-  background-color: var(--accent-rose);
-  color: #fff;
+  background-color: #f43f5e !important;
+  color: #ffffff !important;
 }
 
 .titlebar-btn.pinned {
   color: var(--accent-primary);
   background-color: rgba(99, 102, 241, 0.15);
+  border-color: var(--accent-primary);
 }
 
 /* Header & Connection Bar */
@@ -929,8 +941,5 @@ input:checked + .slider:before {
 @media (max-width: 600px) {
   .metrics-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .titlebar {
-    display: none; /* Hide custom titlebar in browser view */
   }
 }

@@ -609,6 +609,18 @@
       el.modalSettings.classList.add('open');
     });
 
+    const btnQuitApp = document.getElementById('btn-quit-app');
+    if (btnQuitApp) {
+      btnQuitApp.addEventListener('click', () => {
+        if (window.electronAPI && window.electronAPI.isElectron) {
+          window.electronAPI.close();
+        } else {
+          window.close();
+          showNotification('Silakan tutup tab browser Anda untuk keluar.', 'info');
+        }
+      });
+    }
+
     el.btnCloseSettings.addEventListener('click', () => {
       el.modalSettings.classList.remove('open');
     });
@@ -640,23 +652,50 @@
       }
     });
 
-    // Electron desktop integration
-    if (window.electronAPI && window.electronAPI.isElectron) {
-      if (el.btnMin) el.btnMin.addEventListener('click', () => window.electronAPI.minimize());
-      if (el.btnMax) el.btnMax.addEventListener('click', () => window.electronAPI.maximize());
-      if (el.btnClose) el.btnClose.addEventListener('click', () => window.electronAPI.close());
-      if (el.btnPin) {
-        el.btnPin.addEventListener('click', () => {
-          state.isAlwaysOnTop = !state.isAlwaysOnTop;
+    // Window controls (Electron Native & Browser Fallback)
+    if (el.btnClose) {
+      el.btnClose.addEventListener('click', () => {
+        if (window.electronAPI && window.electronAPI.isElectron) {
+          window.electronAPI.close();
+        } else {
+          if (state.connected) sendWsAction('disconnect');
+          window.close();
+          showNotification('Untuk keluar, silakan tutup tab atau jendela browser ini.', 'info');
+        }
+      });
+    }
+
+    if (el.btnMin) {
+      el.btnMin.addEventListener('click', () => {
+        if (window.electronAPI && window.electronAPI.isElectron) {
+          window.electronAPI.minimize();
+        }
+      });
+    }
+
+    if (el.btnMax) {
+      el.btnMax.addEventListener('click', () => {
+        if (window.electronAPI && window.electronAPI.isElectron) {
+          window.electronAPI.maximize();
+        } else {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          } else {
+            document.exitFullscreen().catch(() => {});
+          }
+        }
+      });
+    }
+
+    if (el.btnPin) {
+      el.btnPin.addEventListener('click', () => {
+        state.isAlwaysOnTop = !state.isAlwaysOnTop;
+        if (window.electronAPI && window.electronAPI.isElectron) {
           window.electronAPI.setAlwaysOnTop(state.isAlwaysOnTop);
-          el.btnPin.classList.toggle('pinned', state.isAlwaysOnTop);
-        });
-      }
-    } else {
-      if (el.titlebar) {
-        const controls = el.titlebar.querySelector('.titlebar-controls');
-        if (controls) controls.style.display = 'none';
-      }
+        }
+        el.btnPin.classList.toggle('pinned', state.isAlwaysOnTop);
+        showNotification(state.isAlwaysOnTop ? 'Mode Pin aktif (Selalu di atas)' : 'Mode Pin nonaktif', 'info');
+      });
     }
   }
 
