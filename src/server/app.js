@@ -79,6 +79,11 @@ app.post('/api/disconnect', async (req, res) => {
   }
 });
 
+// Dedicated route for OBS Browser Source Overlay
+app.get('/overlay', (req, res) => {
+  res.sendFile(path.join(publicPath, 'overlay.html'));
+});
+
 // Fallback to index.html
 app.use((req, res) => {
   res.sendFile(path.join(publicPath, 'index.html'));

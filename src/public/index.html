@@ -197,7 +197,29 @@
           </label>
         </div>
 
+        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 8px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
+          <div class="setting-label">
+            <span class="setting-title">Overlay Transparan OBS (Browser Source)</span>
+            <span class="setting-desc">Tambahkan sebagai <strong>Browser Source</strong> di OBS untuk menampilkan chat melayang transparan di layar stream:</span>
+          </div>
+          <div class="remote-link-box">
+            <span id="obs-overlay-url">http://localhost:3000/overlay</span>
+            <button class="btn-primary" id="btn-copy-overlay" style="height: 28px; padding: 0 10px; font-size: 11px;">Salin URL</button>
+          </div>
+        </div>
+
         <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
+          <div class="setting-label">
+            <span class="setting-title">OBS Dock (Tempel Panel di Jendela OBS)</span>
+            <span class="setting-desc">Di OBS Studio, buka menu <strong>Docks -> Custom Browser Docks...</strong>, masukkan URL berikut:</span>
+          </div>
+          <div class="remote-link-box">
+            <span id="obs-dock-url">http://localhost:3000</span>
+            <button class="btn-primary" id="btn-copy-dock" style="height: 28px; padding: 0 10px; font-size: 11px;">Salin URL</button>
+          </div>
+        </div>
+
+        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 8px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
           <div class="setting-label">
             <span class="setting-title">Pantau Lewat HP / Tablet (Jaringan LAN)</span>
             <span class="setting-desc">Buka tautan ini di browser ponsel atau tablet Anda di jaringan Wi-Fi yang sama:</span>

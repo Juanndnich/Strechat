@@ -612,6 +612,11 @@
       const res = await fetch('/api/info');
       if (res.ok) {
         const info = await res.json();
+        const base = `http://localhost:${info.port || 3000}`;
+        const obsOverlayEl = document.getElementById('obs-overlay-url');
+        const obsDockEl = document.getElementById('obs-dock-url');
+        if (obsOverlayEl) obsOverlayEl.textContent = `${base}/overlay`;
+        if (obsDockEl) obsDockEl.textContent = base;
         if (el.remoteUrlText) {
           el.remoteUrlText.textContent = info.remoteUrl;
         }
@@ -746,6 +751,26 @@
         showNotification('Tautan remote berhasil disalin', 'info');
       });
     });
+
+    const btnCopyOverlay = document.getElementById('btn-copy-overlay');
+    if (btnCopyOverlay) {
+      btnCopyOverlay.addEventListener('click', () => {
+        const url = document.getElementById('obs-overlay-url')?.textContent || 'http://localhost:3000/overlay';
+        navigator.clipboard.writeText(url).then(() => {
+          showNotification('Tautan Overlay Transparan OBS berhasil disalin!', 'info');
+        });
+      });
+    }
+
+    const btnCopyDock = document.getElementById('btn-copy-dock');
+    if (btnCopyDock) {
+      btnCopyDock.addEventListener('click', () => {
+        const url = document.getElementById('obs-dock-url')?.textContent || 'http://localhost:3000';
+        navigator.clipboard.writeText(url).then(() => {
+          showNotification('Tautan OBS Dock berhasil disalin!', 'info');
+        });
+      });
+    }
 
     // Sound and TTS toggles
     el.settingSound.addEventListener('change', (e) => {

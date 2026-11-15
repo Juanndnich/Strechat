@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>strechat - OBS Overlay</title>
+  <link rel="stylesheet" href="css/poppins.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: transparent !important;
+      font-family: 'Poppins', sans-serif;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px;
+    }
+
+    /* Container for chat stream */
+    .overlay-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 480px;
+      pointer-events: none;
+    }
+
+    /* Chat bubble */
+    .overlay-item {
+      background: rgba(15, 17, 26, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .overlay-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .overlay-avatar-placeholder {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #f43f5e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .overlay-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .overlay-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .overlay-nickname {
+      font-size: 12px;
+      font-weight: 600;
+      color: #38bdf8;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    }
+
+    .overlay-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-mod {
+      background: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .overlay-text {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #f1f5f9;
+      word-break: break-word;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Gift Highlight */
+    .overlay-item.overlay-gift {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(244, 63, 94, 0.25));
+      border: 1.5px solid rgba(245, 158, 11, 0.6);
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+      animation: giftBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .overlay-gift .overlay-nickname {
+      color: #fbbf24;
+    }
+
+    .overlay-gift .gift-label {
+      color: #fef08a;
+      font-weight: 600;
+    }
+
+    .combo-badge {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 1px 7px;
+      border-radius: 9999px;
+      margin-left: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(15px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes giftBounce {
+      0% { opacity: 0; transform: scale(0.85); }
+      50% { transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay-feed" id="overlay-feed"></div>
+
+  <script>
+    (function () {
+      const feed = document.getElementById('overlay-feed');
+      const maxItems = 7;
+      const fadeDurationMs = 12000; // items fade out after 12s
+
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/ws`;
+
+      function connect() {
+        const ws = new WebSocket(wsUrl);
+
+        ws.onmessage = (event) => {
+          try {
+            const packet = JSON.parse(event.data);
+            if (packet.type === 'chat') {
+              renderChat(packet.data);
+            } else if (packet.type === 'gift') {
+              renderGift(packet.data);
+            }
+          } catch (e) {}
+        };
+
+        ws.onclose = () => setTimeout(connect, 2000);
+      }
+
+      function renderChat(chat) {
+        const item = document.createElement('div');
+        item.className = 'overlay-item';
+
+        const avatar = chat.profilePictureUrl && chat.profilePictureUrl.startsWith('http')
+          ? `<img class="overlay-avatar" src="${chat.profilePictureUrl}" alt="">`
+          : `<div class="overlay-avatar-placeholder">${chat.nickname.charAt(0).toUpperCase()}</div>`;
+
+        const badge = chat.isModerator
+          ? `<span class="overlay-badge badge-mod">MOD</span>`
+          : '';
+
+        item.innerHTML = `
+          ${avatar}
+          <div class="overlay-body">
+            <div class="overlay-header">
+              <span class="overlay-nickname">${chat.nickname}</span>
+              ${badge}
+            </div>
+            <div class="overlay-text">${chat.comment}</div>
+          </div>
+        `;
+
+        addItem(item);
+      }
+
+      function renderGift(data) {
+        const item = document.createElement('div');
+        item.className = 'overlay-item overlay-gift';
+
+        const avatar = data.profilePictureUrl && data.profilePictureUrl.startsWith('http')
+          ? `<img class="overlay-avatar" src="${data.profilePictureUrl}" alt="">`
+          : `<div class="overlay-avatar-placeholder">${data.nickname.charAt(0).toUpperCase()}</div>`;
+
+        const combo = data.repeatCount > 1
+          ? `<span class="combo-badge">x${data.repeatCount}</span>`
+          : '';
+
+        let giftImg = data.gift.giftPictureUrl
+          ? `<img src="${data.gift.giftPictureUrl}" style="width: 22px; height: 22px; vertical-align: middle; margin-left: 4px;" alt="">`
+          : '🎁';
+
+        item.innerHTML = `
+          ${avatar}
+          <div class="overlay-body">
+            <div class="overlay-header">
+              <span class="overlay-nickname">${data.nickname}</span>
+              <span class="overlay-badge" style="background: rgba(245, 158, 11, 0.3); color: #f59e0b; border: 1px solid #f59e0b;">GIFT</span>
+            </div>
+            <div class="overlay-text gift-label">
+              Mengirim <strong>${data.gift.giftName}</strong> (${data.diamonds} 💎) ${combo} ${giftImg}
+            </div>
+          </div>
+        `;
+
+        addItem(item);
+      }
+
+      function addItem(el) {
+        feed.appendChild(el);
+
+        // Keep maximum items
+        while (feed.children.length > maxItems) {
+          feed.removeChild(feed.firstElementChild);
+        }
+
+        // Auto fade out after duration
+        setTimeout(() => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(-10px)';
+          setTimeout(() => el.remove(), 500);
+        }, fadeDurationMs);
+      }
+
+      connect();
+    })();
+  </script>
+</body>
+</html>

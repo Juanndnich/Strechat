@@ -53,7 +53,23 @@ npm start
 ```
 Aplikasi desktop `strechat` akan langsung terbuka dengan tampilan frameless minimalis, tombol Always-on-Top (sematkan di atas layar), minimize, maximize, dan close.
 
-### 4. Menjalankan Mode Web / Server Saja
+### 4. Integrasi Langsung ke OBS Studio
+
+#### A. Chat Overlay Transparan di Layar Stream (Browser Source)
+1. Di OBS Studio, klik tombol **+** pada panel **Sources**.
+2. Pilih **Browser**.
+3. Beri nama (misal: `TikTok Chat Overlay`).
+4. Masukkan URL: `http://localhost:3000/overlay`
+5. Atur Width: `450`, Height: `600`.
+6. Klik **OK**. Chat dan gift live TikTok akan muncul melayang secara transparan di atas layar stream Anda dengan animasi pop-in dan auto-fade!
+
+#### B. Menempelkan Panel strechat ke dalam OBS (Custom Browser Docks)
+1. Di menu atas OBS Studio, klik **Docks** -> **Custom Browser Docks...** (Dok Peramban Kustom).
+2. Di kolom **Dock Name**, ketik: `strechat`.
+3. Di kolom **URL**, masukkan: `http://localhost:3000`
+4. Klik **Apply**. Panel lengkap strechat akan menempel langsung sebagai sidebar di jendela OBS Anda!
+
+### 5. Menjalankan Mode Web / Server Saja
 Jika ingin mengakses lewat browser komputer atau ponsel:
 ```bash
 npm run server
