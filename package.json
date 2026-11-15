@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Aplikasi Desktop Ringan Pemantau Live Chat TikTok, Penonton, GIF, Suka, dan Komentar secara Real-Time",
   "main": "src/main/index.js",
-  "author": "strechat contributors",
+  "author": "Juanndnich <juanndnich@users.noreply.github.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -25,10 +25,10 @@
     "dev": "electron .",
     "test": "node --test test/",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder",
-    "dist:win": "electron-builder --win",
-    "dist:mac": "electron-builder --mac",
-    "dist:linux": "electron-builder --linux"
+    "dist": "electron-builder --publish never",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:linux": "electron-builder --linux --publish never"
   },
   "build": {
     "appId": "com.strechat.desktop",
@@ -62,6 +62,7 @@
         "AppImage",
         "deb"
       ],
+      "maintainer": "Juanndnich <juanndnich@users.noreply.github.com>",
       "category": "AudioVideo",
       "icon": "src/public/icons/icon.png"
     },
