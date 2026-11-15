@@ -221,7 +221,11 @@
           ? `<span class="combo-badge">x${data.repeatCount}</span>`
           : '';
 
-        let giftImg = data.gift.giftPictureUrl
+        const diamonds = data.diamonds !== undefined
+          ? data.diamonds
+          : ((data.gift?.diamondCount || 0) * (data.repeatCount || 1));
+
+        let giftImg = data.gift?.giftPictureUrl
           ? `<img src="${data.gift.giftPictureUrl}" style="width: 22px; height: 22px; vertical-align: middle; margin-left: 4px;" alt="">`
           : '🎁';
 
@@ -233,7 +237,7 @@
               <span class="overlay-badge" style="background: rgba(245, 158, 11, 0.3); color: #f59e0b; border: 1px solid #f59e0b;">GIFT</span>
             </div>
             <div class="overlay-text gift-label">
-              Mengirim <strong>${data.gift.giftName}</strong> (${data.diamonds} 💎) ${combo} ${giftImg}
+              Mengirim <strong>${data.gift?.giftName || 'Gift'}</strong> (${diamonds} 💎) ${combo} ${giftImg}
             </div>
           </div>
         `;

@@ -42,4 +42,5 @@ Dokumen ini memetakan tahapan implementasi teknis Strechat dari tahap stabilitas
 - [x] **Multi-Platform CI/CD:** GitHub Actions runner `.github/workflows/build-release.yml` dioptimalkan dengan pengujian unit otomatis `npm test`.
 - [x] **Metadata & Repository Sync:** Sinkronisasi metadata `package.json` dengan repositori resmi `https://github.com/Juanndnich/Strechat.git`.
 - [x] **Bilingual Documentation:** Panduan instalasi, konfigurasi OBS Browser Source, dan OBS Dock yang komprehensif pada `README.md` dan `README_ID.md`.
+- [x] **Minimalist Dark Desktop Experience (UI Redesign):** Perombakan visual ke tema Obsidian Dark, Metrics Strip ringkas, chat viewport >75%, modal pengaturan terkategori, dan sistem SVG outline konsisten.
 - [x] **Quality Assurance & Zero Sensitive Data:** Pemeriksaan `.gitignore`, ketiadaan file rahasia/token, dan verifikasi lisensi MIT.

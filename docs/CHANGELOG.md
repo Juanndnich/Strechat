@@ -4,6 +4,13 @@ Semua perubahan penting pada proyek Strechat didokumentasikan di berkas ini.
 
 ## [1.0.0] - 2026-11-15
 
+### Minimalist Dark Desktop Experience (UI/UX Redesign)
+- **Obsidian Dark Palette:** Perombakan estetika antarmuka menyeluruh menggunakan palet arang gelap Obsidian (`#0d0f14`, `#131620`, `#181b26`), aksen warna terkontrol (rose, amber, sky, indigo), dan eliminasi gradien/glassmorphism berlebihan.
+- **Compact Horizontal Metrics Strip:** Menggantikan 4 card besar dengan horizontal metrics strip tipis (menghemat ~36px tinggi layar) untuk metrik penonton, suka, diamond, dan komentar.
+- **Maximized Chat Viewport (>75% Real Estate):** Mengoptimalkan tata letak agar feed obrolan mendominasi lebih dari 75% ketinggian layar untuk kenyamanan memantau ribuan pesan saat live.
+- **Categorized Settings Modal:** Penataan ulang modal pengaturan ke dalam 6 bagian terstruktur (Tampilan & Obrolan, Suara & TTS, Moderasi, Integrasi OBS Studio, Akses LAN Wi-Fi, dan Kontrol Aplikasi).
+- **100% SVG Vector System:** Penggunaan ikon SVG outline konsisten tanpa emoji pada navigasi dan tombol sistem.
+
 ### Release Preparation & CI/CD (P5)
 - **CI/CD Test Automation:** Menambahkan tahap eksekusi pengujian otomatis `npm test` pada alur kerja GitHub Actions `.github/workflows/build-release.yml`.
 - **Repository Metadata Sync:** Menyelaraskan URL repositori resmi pada `package.json` ke `https://github.com/Juanndnich/Strechat.git`.
