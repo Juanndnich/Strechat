@@ -29,7 +29,8 @@ Dokumen ini memetakan tahapan implementasi teknis Strechat dari tahap stabilitas
 
 ---
 
-## 📌 Phase 4 — Live Analytics & Export (Roadmap Lanjutan)
-- [ ] Top Gifter Leaderboard selama sesi live berlangsung.
-- [ ] Grafik riwayat jumlah penonton, suka, dan diamond.
-- [ ] Ekspor riwayat sesi obrolan dan donasi ke format CSV / JSON.
+## 📌 Phase 4 — Live Analytics & Export (P4) — SELESAI ✅
+- [x] **Live Session Tracking:** Pelacakan otomatis durasi live, peak viewers, dan rata-rata penonton secara real-time.
+- [x] **Top Donatur Leaderboard:** Peringkat 5 donatur teratas (*Top Gifters*) berdasarkan akumulasi diamond dan total gift.
+- [x] **Session History Storage:** Penyimpanan riwayat sesi live secara lokal di `data/sessions.json` tanpa dependensi database berat.
+- [x] **One-Click Data Export:** Fitur ekspor langsung laporan sesi live ke format CSV dan JSON melalui REST API.

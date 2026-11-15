@@ -33,3 +33,7 @@ desktop.ini
 # Temporary files
 tmp/
 temp/
+
+# Local User Data & Session History
+data/*.json
+!data/.gitkeep

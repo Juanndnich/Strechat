@@ -5,6 +5,7 @@
 
 const EventEmitter = require('events');
 const { cleanUsername, sanitizeComment, sanitizeGift } = require('./utils/sanitizer');
+const sessionService = require('./sessionService');
 
 class TikTokLiveService extends EventEmitter {
   constructor() {
@@ -157,6 +158,9 @@ class TikTokLiveService extends EventEmitter {
       this.stats.connectedAt = this.stats.connectedAt || Date.now();
       this.stats.roomId = data?.roomId || null;
 
+      // Start live session tracking (P4)
+      sessionService.startSession(this.uniqueId, this.stats.roomId);
+
       // Seed initial room statistics (viewers & likes) immediately
       if (this.stats.roomId) {
         try {
@@ -251,6 +255,7 @@ class TikTokLiveService extends EventEmitter {
       };
 
       this.emit('chat', chatEvent);
+      sessionService.recordChat(chatEvent);
       this.emit('stats_update', this.getStatus());
     });
 
@@ -299,6 +304,7 @@ class TikTokLiveService extends EventEmitter {
       };
 
       this.emit('gift', giftEvent);
+      sessionService.recordGift(giftEvent);
       this.emit('stats_update', this.getStatus());
     });
 
@@ -324,6 +330,7 @@ class TikTokLiveService extends EventEmitter {
       };
 
       this.emit('like', likeEvent);
+      sessionService.recordLike(likeEvent);
       this.emit('stats_update', this.getStatus());
     });
 
@@ -342,6 +349,7 @@ class TikTokLiveService extends EventEmitter {
           peakViewers: this.stats.peakViewers,
           timestamp: Date.now()
         });
+        sessionService.recordViewers(count);
         this.emit('stats_update', this.getStatus());
       }
     });
@@ -361,6 +369,7 @@ class TikTokLiveService extends EventEmitter {
     // Stream Ended by Host
     this.client.on(EventType.liveEnded, () => {
       this.status = 'DISCONNECTED';
+      sessionService.endSession();
       clearInterval(this.syncTimer);
       clearTimeout(this.graceTimer);
       this.emit('streamEnd', {
@@ -402,6 +411,7 @@ class TikTokLiveService extends EventEmitter {
 
   async disconnect() {
     this.isManualDisconnect = true;
+    sessionService.endSession();
     clearTimeout(this.reconnectTimer);
     clearTimeout(this.graceTimer);
     clearInterval(this.syncTimer);

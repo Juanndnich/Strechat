@@ -8,6 +8,7 @@ const http = require('http');
 const path = require('path');
 const cors = require('cors');
 const tikTokService = require('./tiktokService');
+const sessionService = require('./sessionService');
 const websocketHandler = require('./websocketHandler');
 const { getLocalIpAddress } = require('./utils/network');
 
@@ -51,6 +52,30 @@ app.get('/api/info', (req, res) => {
 
 app.get('/api/status', (req, res) => {
   res.json(tikTokService.getStatus());
+});
+
+// Live Analytics & Session Endpoints (P4)
+app.get('/api/session/current', (req, res) => {
+  res.json(sessionService.getCurrentAnalytics());
+});
+
+app.get('/api/session/history', (req, res) => {
+  res.json(sessionService.getHistory());
+});
+
+app.get('/api/session/export', (req, res) => {
+  const format = req.query.format === 'csv' ? 'csv' : 'json';
+  const result = sessionService.generateExport(format);
+
+  if (format === 'csv') {
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="strechat-session-${Date.now()}.csv"`);
+    return res.send(result.data);
+  }
+
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="strechat-session-${Date.now()}.json"`);
+  res.send(result.data);
 });
 
 app.post('/api/connect', async (req, res) => {

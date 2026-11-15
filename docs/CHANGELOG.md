@@ -4,6 +4,13 @@ Semua perubahan penting pada proyek Strechat didokumentasikan di berkas ini.
 
 ## [1.0.0] - 2026-11-15
 
+### Live Analytics & Data Export (P4)
+- **Live Session Service:** Menambahkan `src/server/sessionService.js` untuk pelacakan metrik sesi real-time (durasi, peak viewers, dan rata-rata penonton).
+- **Top Donatur Leaderboard:** Menghitung dan meranking donatur teratas (*Top 5 Gifters*) secara live berdasarkan diamond yang dikirimkan.
+- **Local Session Persistence:** Menyimpan ringkasan sesi live ke penyimpanan lokal `data/sessions.json` secara aman dan ringan tanpa dependensi database eksternal.
+- **CSV & JSON Export:** Endpoint `/api/session/export` untuk mengunduh laporan sesi obrolan, metrik analitik, dan tabel donatur dalam satu klik.
+- **Analytics Dashboard Modal:** Tampilan antarmuka khusus (`#modal-analytics`) dengan kartu KPI live dan daftar peringkat donatur.
+
 ### Usability & Streamer Experience (P3)
 - **System Tray Integration:** Menambahkan dukungan System Tray native dengan menu konteks "Buka Strechat" dan "Keluar dari Aplikasi", serta toggle tampilkan/sembunyikan jendela via klik kiri ikon tray.
 - **Hide-to-Tray Lifecycle:** Mengalihkan tombol tutup jendela (`X`) untuk menyembunyikan aplikasi ke System Tray agar monitoring live stream tidak terputus di latar belakang.

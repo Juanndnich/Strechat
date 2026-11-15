@@ -603,6 +603,81 @@
     }, 3500);
   }
 
+  // Analytics & Export Helpers (P4)
+  async function loadAnalyticsData() {
+    try {
+      const res = await fetch('/api/session/current');
+      const data = await res.json();
+      const summary = data.summary || {};
+
+      const durationEl = document.getElementById('analytics-duration');
+      if (durationEl) durationEl.textContent = formatTime(summary.durationSeconds || 0);
+
+      const peakEl = document.getElementById('analytics-peak');
+      if (peakEl) peakEl.textContent = formatNumber(summary.peakViewers || 0);
+
+      const avgEl = document.getElementById('analytics-avg');
+      if (avgEl) avgEl.textContent = formatNumber(summary.averageViewers || 0);
+
+      const totalDiaEl = document.getElementById('analytics-total-diamonds');
+      if (totalDiaEl) totalDiaEl.textContent = `${formatNumber(summary.totalDiamonds || 0)} Diamond`;
+
+      const listEl = document.getElementById('leaderboard-list');
+      if (!listEl) return;
+
+      if (!data.topGifters || data.topGifters.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 12px;">
+            Belum ada gift yang masuk pada sesi live ini.
+          </div>
+        `;
+        return;
+      }
+
+      const rankColors = ['#f59e0b', '#94a3b8', '#d97706', '#64748b', '#475569'];
+      listEl.innerHTML = data.topGifters.map((g, idx) => {
+        const color = rankColors[idx] || '#64748b';
+        const avatarHtml = g.avatar
+          ? `<img src="${g.avatar}" class="gift-avatar" style="width: 24px; height: 24px; border-radius: 50%;" onerror="this.style.display='none'">`
+          : `<div class="gift-avatar-placeholder" style="width: 24px; height: 24px; font-size: 10px;">${(g.nickname || 'U')[0].toUpperCase()}</div>`;
+
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-weight: 700; font-size: 11px; width: 16px; text-align: center; color: ${color};">#${idx + 1}</span>
+              ${avatarHtml}
+              <div style="display: flex; flex-direction: column;">
+                <span style="font-weight: 600; font-size: 12px; color: var(--text-primary);">${g.nickname}</span>
+                <span style="font-size: 10px; color: var(--text-muted);">${g.giftCount}x gift</span>
+              </div>
+            </div>
+            <span style="font-weight: 700; font-size: 12px; color: var(--accent-amber);">${formatNumber(g.diamonds)} 💎</span>
+          </div>
+        `;
+      }).join('');
+    } catch (e) {
+      console.warn('[strechat] Gagal memuat data analytics:', e);
+    }
+  }
+
+  async function downloadExport(format) {
+    try {
+      const res = await fetch(`/api/session/export?format=${format}`);
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `strechat-session-${Date.now()}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      showNotification(`Laporan ${format.toUpperCase()} berhasil diunduh`, 'info');
+    } catch (e) {
+      showNotification(`Gagal mengunduh laporan ${format.toUpperCase()}`, 'error');
+    }
+  }
+
   // Fetch Server & Network Info
   async function loadServerInfo() {
     try {
@@ -718,6 +793,44 @@
       loadServerInfo();
       el.modalSettings.classList.add('open');
     });
+
+    // Analytics & Leaderboard Modal (P4)
+    const btnAnalytics = document.getElementById('btn-analytics');
+    const modalAnalytics = document.getElementById('modal-analytics');
+    const btnCloseAnalytics = document.getElementById('btn-close-analytics');
+
+    if (btnAnalytics && modalAnalytics) {
+      btnAnalytics.addEventListener('click', () => {
+        loadAnalyticsData();
+        modalAnalytics.classList.add('open');
+      });
+      if (btnCloseAnalytics) {
+        btnCloseAnalytics.addEventListener('click', () => {
+          modalAnalytics.classList.remove('open');
+        });
+      }
+      modalAnalytics.addEventListener('click', (e) => {
+        if (e.target === modalAnalytics) {
+          modalAnalytics.classList.remove('open');
+        }
+      });
+    }
+
+    const btnExportCsv = document.getElementById('btn-export-csv');
+    if (btnExportCsv) {
+      btnExportCsv.addEventListener('click', (e) => {
+        e.preventDefault();
+        downloadExport('csv');
+      });
+    }
+
+    const btnExportJson = document.getElementById('btn-export-json');
+    if (btnExportJson) {
+      btnExportJson.addEventListener('click', (e) => {
+        e.preventDefault();
+        downloadExport('json');
+      });
+    }
 
     const btnQuitApp = document.getElementById('btn-quit-app');
     if (btnQuitApp) {

@@ -47,6 +47,9 @@
       <button class="btn-icon" id="btn-theme" title="Ganti Tema">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
       </button>
+      <button class="btn-icon" id="btn-analytics" title="Analitik & Top Donatur">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      </button>
       <button class="btn-icon" id="btn-settings" title="Pengaturan">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
       </button>
@@ -256,6 +259,67 @@
           <button class="btn-primary btn-danger" id="btn-quit-app" style="height: 32px; padding: 0 14px; font-size: 12px;">
             Keluar Aplikasi
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics & Leaderboard Modal (P4) -->
+  <div class="modal-overlay" id="modal-analytics">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2>Analitik Sesi Live & Top Donatur</h2>
+        <button class="titlebar-btn" id="btn-close-analytics">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Live Analytics Summary -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+          <div class="metric-card">
+            <span class="metric-header" style="font-size: 9px;">DURASI LIVE</span>
+            <span class="metric-value" id="analytics-duration" style="font-size: 15px;">00:00</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-header" style="font-size: 9px;">PEAK VIEWERS</span>
+            <span class="metric-value" id="analytics-peak" style="font-size: 15px;">0</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-header" style="font-size: 9px;">RATA-RATA</span>
+            <span class="metric-value" id="analytics-avg" style="font-size: 15px;">0</span>
+          </div>
+        </div>
+
+        <!-- Top Donors Leaderboard -->
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span class="setting-title" style="display: flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" color="var(--accent-amber)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              Top Donatur (Pemberi Gift)
+            </span>
+            <span class="setting-desc" id="analytics-total-diamonds" style="color: var(--accent-amber); font-weight: 600;">0 Diamond</span>
+          </div>
+          <div class="leaderboard-list" id="leaderboard-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto;">
+            <div style="text-align: center; padding: 16px; color: var(--text-muted); font-size: 12px;">
+              Belum ada gift yang masuk pada sesi live ini.
+            </div>
+          </div>
+        </div>
+
+        <!-- Export Data Section -->
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <span class="setting-title">Ekspor Laporan Sesi Live</span>
+          <span class="setting-desc">Unduh rangkuman statistik, daftar donatur, dan riwayat obrolan:</span>
+          <div style="display: flex; gap: 8px;">
+            <a href="/api/session/export?format=csv" target="_blank" class="btn-primary" id="btn-export-csv" style="flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; height: 32px; font-size: 12px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Unduh CSV
+            </a>
+            <a href="/api/session/export?format=json" target="_blank" class="btn-primary btn-secondary" id="btn-export-json" style="flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; height: 32px; font-size: 12px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              Unduh JSON
+            </a>
+          </div>
         </div>
       </div>
     </div>
