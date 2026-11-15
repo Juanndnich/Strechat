@@ -106,7 +106,7 @@ function createPng(width, height) {
   return Buffer.concat([signature, ihdrChunk, idatChunk, iendChunk]);
 }
 
-const iconBuf = createPng(256, 256);
+const iconBuf = createPng(512, 512);
 fs.writeFileSync(path.join(__dirname, 'icon.png'), iconBuf);
 console.log('icon.png generated successfully, size:', iconBuf.length, 'bytes');
 

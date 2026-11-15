@@ -54,7 +54,8 @@
         "zip"
       ],
       "category": "public.app-category.developer-tools",
-      "icon": "src/public/icons/icon.png"
+      "icon": "src/public/icons/icon.png",
+      "identity": null
     },
     "linux": {
       "target": [
