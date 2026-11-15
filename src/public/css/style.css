@@ -399,13 +399,13 @@ body {
 
 .chat-search-wrap {
   position: relative;
-  width: 110px;
+  width: 130px;
   flex-shrink: 0;
   transition: width 0.2s ease;
 }
 
 .chat-search-wrap:focus-within {
-  width: 135px;
+  width: 170px;
 }
 
 .chat-search-input {

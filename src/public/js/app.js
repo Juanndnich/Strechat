@@ -553,15 +553,11 @@
 
   // Filter application
   function applyItemFilter(item) {
-    const isQuestion = item.dataset.isQuestion === 'true';
-    const isMod = item.dataset.isMod === 'true';
     const isGift = item.dataset.isGift === 'true';
     const text = item.textContent.toLowerCase();
 
     let matchesFilter = true;
     if (state.filter === 'gifts' && !isGift) matchesFilter = false;
-    if (state.filter === 'questions' && !isQuestion) matchesFilter = false;
-    if (state.filter === 'mods' && !isMod) matchesFilter = false;
 
     let matchesSearch = true;
     if (state.searchQuery && !text.includes(state.searchQuery)) {
