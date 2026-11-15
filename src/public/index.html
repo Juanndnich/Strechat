@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>strechat - TikTok Live Monitor</title>
+  <link rel="stylesheet" href="css/poppins.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Custom Desktop Window Titlebar -->
+  <header class="titlebar" id="titlebar">
+    <div class="titlebar-brand">
+      <span class="brand-dot"></span>
+      <span>strechat</span>
+    </div>
+    <div class="titlebar-controls">
+      <button class="titlebar-btn" id="btn-pin" title="Selalu di Atas (Always on Top)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v8M5 10h14M12 10l-4 12M12 10l4 12"/></svg>
+      </button>
+      <button class="titlebar-btn" id="btn-min" title="Minimize">
+        <svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+      <button class="titlebar-btn" id="btn-max" title="Maximize">
+        <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+      </button>
+      <button class="titlebar-btn btn-close" id="btn-close" title="Close">
+        <svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Top Connection Bar & Live Controls -->
+  <section class="app-header">
+    <div class="connection-row">
+      <div class="input-group">
+        <span class="input-prefix">@</span>
+        <input type="text" id="channel-input" class="channel-input" placeholder="Username TikTok..." spellcheck="false" autocomplete="off">
+      </div>
+      <button class="btn-primary" id="btn-connect">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        Mulai Pantau
+      </button>
+      <button class="btn-icon" id="btn-demo" title="Mode Demo / Simulasi">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+      </button>
+      <button class="btn-icon" id="btn-theme" title="Ganti Tema">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <button class="btn-icon" id="btn-settings" title="Pengaturan">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+    </div>
+
+    <!-- Status Sub-bar -->
+    <div class="status-bar">
+      <div class="status-indicator">
+        <span class="status-dot disconnected" id="status-dot"></span>
+        <span id="status-text">Siap memantau</span>
+      </div>
+      <div class="status-meta">
+        <span title="Durasi Terhubung">⏱️ <span id="status-uptime">00:00</span></span>
+        <span title="Latensi WebSocket">⚡ <span id="status-ping">0ms</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Real-Time Metrics KPI Grid -->
+  <section class="metrics-grid">
+    <div class="metric-card viewers">
+      <div class="metric-header">
+        <span>Penonton</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </div>
+      <div class="metric-value" id="metric-viewers">0</div>
+      <div class="metric-sub" id="metric-peak">Puncak: 0</div>
+    </div>
+
+    <div class="metric-card likes">
+      <div class="metric-header">
+        <span>Suka</span>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </div>
+      <div class="metric-value" id="metric-likes">0</div>
+      <div class="metric-sub">Total live tap</div>
+    </div>
+
+    <div class="metric-card diamonds">
+      <div class="metric-header">
+        <span>Diamond</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 8.5 12 22 22 8.5 12 2"></polygon><line x1="2" y1="8.5" x2="22" y2="8.5"></line><line x1="12" y1="2" x2="7 8.5"></line><line x1="12" y1="2" x2="17 8.5"></line><line x1="12" y1="22" x2="7 8.5"></line><line x1="12" y1="22" x2="17 8.5"></line></svg>
+      </div>
+      <div class="metric-value" id="metric-diamonds">0</div>
+      <div class="metric-sub">Nilai gift</div>
+    </div>
+
+    <div class="metric-card comments">
+      <div class="metric-header">
+        <span>Komentar</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <div class="metric-value" id="metric-comments">0</div>
+      <div class="metric-sub">Total obrolan</div>
+    </div>
+  </section>
+
+  <!-- Filter and Search Row -->
+  <div class="filter-bar">
+    <div class="filter-pills">
+      <button class="pill-btn active" data-filter="all">Semua</button>
+      <button class="pill-btn" data-filter="questions">Pertanyaan (?)</button>
+      <button class="pill-btn" data-filter="mods">Moderator</button>
+    </div>
+    <div class="chat-search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="chat-search-input" class="chat-search-input" placeholder="Cari komentar...">
+    </div>
+  </div>
+
+  <!-- Floating Gift Banner Popups Area -->
+  <div class="gift-banner-area" id="gift-banner-area"></div>
+
+  <!-- Pinned Comment Bar -->
+  <div class="pinned-container" id="pinned-container" style="display: none;">
+    <div>
+      <div class="pinned-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>
+        Pesan Disematkan
+      </div>
+      <div class="pinned-content">
+        <span class="pinned-author" id="pinned-author">User:</span>
+        <span id="pinned-text">Pesan yang disematkan akan muncul di sini.</span>
+      </div>
+    </div>
+    <button class="pinned-unpin-btn" id="btn-dismiss-pin" title="Lepas sematan">✕</button>
+  </div>
+
+  <!-- Main Live Chat Stream -->
+  <main class="chat-container" id="chat-container">
+    <div class="chat-empty" id="chat-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+      <h3>Belum Ada Obrolan</h3>
+      <p>Masukkan username TikTok streamer di atas lalu klik "Mulai Pantau" atau gunakan "Mode Demo" untuk simulasi.</p>
+    </div>
+  </main>
+
+  <!-- Auto-scroll indicator button -->
+  <button class="scroll-bottom-btn" id="btn-scroll-bottom" style="display: none;">
+    ↓ Pesan Baru
+  </button>
+
+  <!-- Settings & Multi-Device Modal -->
+  <div class="modal-overlay" id="modal-settings">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Pengaturan strechat</h2>
+        <button class="titlebar-btn" id="btn-close-settings">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-item">
+          <div class="setting-label">
+            <span class="setting-title">Suara Notifikasi Gift</span>
+            <span class="setting-desc">Bunyikan lonceng sintetis saat menerima gift</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-sound" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-label">
+            <span class="setting-title">Text-to-Speech (TTS) Suara</span>
+            <span class="setting-desc">Bacakan nama pengirim dan jenis gift</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-tts">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
+          <div class="setting-label">
+            <span class="setting-title">Pantau Lewat HP / Tablet (Jaringan LAN)</span>
+            <span class="setting-desc">Buka tautan ini di browser ponsel atau tablet Anda di jaringan Wi-Fi yang sama:</span>
+          </div>
+          <div class="remote-link-box">
+            <span id="remote-url-text">http://localhost:3000</span>
+            <button class="btn-primary" id="btn-copy-remote" style="height: 28px; padding: 0 10px; font-size: 11px;">Salin</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/tts.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

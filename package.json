@@ -1,0 +1,84 @@
+{
+  "name": "strechat",
+  "version": "1.0.0",
+  "description": "Aplikasi Desktop Ringan Pemantau Live Chat TikTok, Penonton, GIF, Suka, dan Komentar secara Real-Time",
+  "main": "src/main/index.js",
+  "author": "strechat contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/strechat/strechat.git"
+  },
+  "keywords": [
+    "tiktok",
+    "tiktok-live",
+    "stream-chat",
+    "chat-monitor",
+    "electron",
+    "desktop-app",
+    "streaming-tools",
+    "obs-alternative"
+  ],
+  "scripts": {
+    "start": "electron .",
+    "server": "node src/server/app.js",
+    "dev": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.strechat.desktop",
+    "productName": "strechat",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "src/public/icons/icon.png"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.developer-tools",
+      "icon": "src/public/icons/icon.png"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "AudioVideo",
+      "icon": "src/public/icons/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "tiktok-live-connector": "^2.5.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "^40.0.0",
+    "electron-builder": "^26.4.0"
+  }
+}
