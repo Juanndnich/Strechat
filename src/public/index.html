@@ -59,8 +59,14 @@
         <span id="status-text">Siap memantau</span>
       </div>
       <div class="status-meta">
-        <span title="Durasi Terhubung">⏱️ <span id="status-uptime">00:00</span></span>
-        <span title="Latensi WebSocket">⚡ <span id="status-ping">0ms</span></span>
+        <span title="Durasi Terhubung" style="display: flex; align-items: center; gap: 4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span id="status-uptime">00:00</span>
+        </span>
+        <span title="Latensi WebSocket" style="display: flex; align-items: center; gap: 4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span id="status-ping">0ms</span>
+        </span>
       </div>
     </div>
   </section>
@@ -108,7 +114,10 @@
   <div class="filter-bar">
     <div class="filter-pills">
       <button class="pill-btn active" data-filter="all">Semua</button>
-      <button class="pill-btn" data-filter="questions">Pertanyaan (?)</button>
+      <button class="pill-btn" data-filter="questions" style="display: flex; align-items: center; gap: 4px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        Pertanyaan
+      </button>
       <button class="pill-btn" data-filter="mods">Moderator</button>
     </div>
     <div class="chat-search-wrap">
@@ -132,7 +141,9 @@
         <span id="pinned-text">Pesan yang disematkan akan muncul di sini.</span>
       </div>
     </div>
-    <button class="pinned-unpin-btn" id="btn-dismiss-pin" title="Lepas sematan">✕</button>
+    <button class="pinned-unpin-btn" id="btn-dismiss-pin" title="Lepas sematan">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
   </div>
 
   <!-- Main Live Chat Stream -->
@@ -146,7 +157,8 @@
 
   <!-- Auto-scroll indicator button -->
   <button class="scroll-bottom-btn" id="btn-scroll-bottom" style="display: none;">
-    ↓ Pesan Baru
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    Pesan Baru
   </button>
 
   <!-- Settings & Multi-Device Modal -->
@@ -154,13 +166,15 @@
     <div class="modal-card">
       <div class="modal-header">
         <h2>Pengaturan strechat</h2>
-        <button class="titlebar-btn" id="btn-close-settings">✕</button>
+        <button class="titlebar-btn" id="btn-close-settings">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <div class="modal-body">
         <div class="setting-item">
           <div class="setting-label">
             <span class="setting-title">Suara Notifikasi Gift</span>
-            <span class="setting-desc">Bunyikan lonceng sintetis saat menerima gift</span>
+            <span class="setting-desc">Bunyikan nada lonceng saat menerima gift</span>
           </div>
           <label class="switch">
             <input type="checkbox" id="setting-sound" checked>

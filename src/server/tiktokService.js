@@ -1,16 +1,15 @@
 /**
  * strechat - TikTok Live Connector Service
- * Manages live connection lifecycle, automatic reconnects, metrics calculation, and event normalization.
+ * Direct Webcast WebSocket connection without third-party paid signing dependencies.
  */
 
 const EventEmitter = require('events');
-const { TikTokLiveConnection } = require('tiktok-live-connector');
 const { cleanUsername, sanitizeComment, sanitizeGift } = require('./utils/sanitizer');
 
 class TikTokLiveService extends EventEmitter {
   constructor() {
     super();
-    this.connection = null;
+    this.client = null;
     this.uniqueId = null;
     this.options = {};
     this.status = 'DISCONNECTED'; // DISCONNECTED | CONNECTING | CONNECTED | RECONNECTING
@@ -29,9 +28,11 @@ class TikTokLiveService extends EventEmitter {
       totalGifts: 0,
       totalComments: 0,
       connectedAt: null,
-      roomId: null,
-      roomInfo: null
+      roomId: null
     };
+
+    // Prevent unhandled error crashes if no external listener is attached
+    this.on('error', () => {});
   }
 
   resetStats() {
@@ -44,8 +45,7 @@ class TikTokLiveService extends EventEmitter {
       totalGifts: 0,
       totalComments: 0,
       connectedAt: null,
-      roomId: null,
-      roomInfo: null
+      roomId: null
     };
   }
 
@@ -77,28 +77,65 @@ class TikTokLiveService extends EventEmitter {
     this.emit('status', this.getStatus());
 
     try {
-      const clientConfig = {
-        processInitialData: true,
-        enableExtendedGiftInfo: true,
-        requestHeaders: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+      // Dynamic import of piratetok-live-js (ESM)
+      const { TikTokLiveClient, EventType } = await import('piratetok-live-js');
+
+      this.client = new TikTokLiveClient(this.uniqueId);
+
+      // Bind events
+      this._bindClientEvents(EventType);
+
+      // Start connection
+      // client.connect() resolves when connected or supervisor loop terminates
+      this.client.connect().catch((err) => {
+        if (!this.isManualDisconnect) {
+          const errMsg = this._formatErrorMessage(err);
+          this.status = 'DISCONNECTED';
+          this.emit('status', this.getStatus());
+          this.emit('error', {
+            message: errMsg,
+            detail: String(err?.message || err)
+          });
         }
-      };
+      });
 
-      if (customOptions.sessionId && typeof customOptions.sessionId === 'string' && customOptions.sessionId.trim().length > 0) {
-        clientConfig.sessionId = customOptions.sessionId.trim();
-      }
+      // Mark connected when connection opens
+      return this.getStatus();
+    } catch (err) {
+      this.status = 'DISCONNECTED';
+      const errMsg = this._formatErrorMessage(err);
+      this.emit('status', this.getStatus());
+      this.emit('error', {
+        message: errMsg,
+        detail: String(err?.message || err)
+      });
+      throw new Error(errMsg);
+    }
+  }
 
-      this.connection = new TikTokLiveConnection(this.uniqueId, clientConfig);
+  _formatErrorMessage(err) {
+    const raw = String(err?.message || err || '');
+    if (raw.toLowerCase().includes('not currently live') || raw.toLowerCase().includes('offline')) {
+      return `Streamer @${this.uniqueId} sedang offline / tidak sedang live.`;
+    }
+    if (raw.toLowerCase().includes('user not found') || raw.toLowerCase().includes('404')) {
+      return `Pengguna @${this.uniqueId} tidak ditemukan di TikTok.`;
+    }
+    if (raw.toLowerCase().includes('age restricted')) {
+      return `Live stream @${this.uniqueId} dibatasi usia.`;
+    }
+    return `Koneksi ke @${this.uniqueId} gagal: ${raw}`;
+  }
 
-      this._bindEvents();
+  _bindClientEvents(EventType) {
+    if (!this.client) return;
 
-      const state = await this.connection.connect();
+    // Connection opened
+    this.client.on(EventType.connected, (data) => {
       this.status = 'CONNECTED';
       this.reconnectAttempts = 0;
       this.stats.connectedAt = Date.now();
-      this.stats.roomId = state?.roomId || null;
-      this.stats.roomInfo = state?.roomInfo || null;
+      this.stats.roomId = data?.roomId || null;
 
       this.emit('connected', {
         uniqueId: this.uniqueId,
@@ -106,39 +143,37 @@ class TikTokLiveService extends EventEmitter {
         status: this.status
       });
       this.emit('status', this.getStatus());
-
-      return this.getStatus();
-    } catch (err) {
-      this.status = 'DISCONNECTED';
-      this.emit('status', this.getStatus());
-      this.emit('error', {
-        message: err?.message || 'Gagal terhubung ke live stream TikTok.',
-        detail: String(err)
-      });
-      throw err;
-    }
-  }
-
-  _bindEvents() {
-    if (!this.connection) return;
+    });
 
     // Chat Message
-    this.connection.on('chat', (data) => {
+    this.client.on(EventType.chat, (data) => {
       this.stats.totalComments++;
+      const user = data?.user || {};
+      const uniqueId = cleanUsername(user?.displayId || user?.nickname || 'user');
+      const nickname = cleanUsername(user?.nickname || user?.displayId || uniqueId);
+      const comment = sanitizeComment(data?.content || '');
+
+      // Avatar extraction from Webcast profileThumb
+      let avatarUrl = '';
+      if (user?.profileThumb?.urlList && Array.isArray(user.profileThumb.urlList) && user.profileThumb.urlList.length > 0) {
+        avatarUrl = user.profileThumb.urlList[0] || '';
+      }
+
+      // Moderator check
+      let isMod = false;
+      if (Array.isArray(user?.badgeList)) {
+        isMod = user.badgeList.some(b => String(b?.name || '').toLowerCase().includes('mod'));
+      }
+
       const chatEvent = {
         id: `chat-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
-        uniqueId: cleanUsername(data?.uniqueId),
-        nickname: cleanUsername(data?.nickname || data?.uniqueId),
-        comment: sanitizeComment(data?.comment),
-        profilePictureUrl: data?.profilePictureUrl || '',
-        badges: Array.isArray(data?.userBadges)
-          ? data.userBadges.map((b) => ({
-              type: b?.badgeSceneType || 'badge',
-              name: b?.name || ''
-            }))
-          : [],
-        isModerator: Boolean(data?.isModerator),
-        isSubscriber: Boolean(data?.isSubscriber),
+        uniqueId,
+        nickname,
+        comment,
+        profilePictureUrl: avatarUrl,
+        badges: isMod ? [{ type: 'mod', name: 'MOD' }] : [],
+        isModerator: isMod,
+        isSubscriber: false,
         timestamp: Date.now()
       };
 
@@ -146,26 +181,47 @@ class TikTokLiveService extends EventEmitter {
       this.emit('stats_update', this.getStatus());
     });
 
-    // Gifts / GIFs
-    this.connection.on('gift', (data) => {
-      const sanitizedGift = sanitizeGift(data);
-      if (!sanitizedGift) return;
+    // Gift Message
+    this.client.on(EventType.gift, (data) => {
+      const giftData = data?.gift || {};
+      const user = data?.user || {};
+      const repeatCount = Math.max(1, Number(data?.repeatCount || data?.comboCount || 1));
+      const diamondCount = Math.max(0, Number(giftData?.diamondCount || 0));
+      const isOver = Boolean(data?.isStreakOver ?? (Number(data?.repeatEnd ?? 0) === 1));
 
-      const diamonds = sanitizedGift.diamondCount * (data.repeatEnd ? sanitizedGift.repeatCount : 1);
-      if (data.repeatEnd || sanitizedGift.repeatCount === 1) {
+      // Gift icon
+      let giftIcon = '';
+      if (giftData?.image?.urlList && Array.isArray(giftData.image.urlList) && giftData.image.urlList.length > 0) {
+        giftIcon = giftData.image.urlList[0] || '';
+      }
+
+      const diamonds = diamondCount * (isOver ? repeatCount : 1);
+      if (isOver || repeatCount === 1) {
         this.stats.totalDiamonds += diamonds;
-        this.stats.totalGifts += sanitizedGift.repeatCount;
+        this.stats.totalGifts += repeatCount;
+      }
+
+      let avatarUrl = '';
+      if (user?.profileThumb?.urlList && Array.isArray(user.profileThumb.urlList) && user.profileThumb.urlList.length > 0) {
+        avatarUrl = user.profileThumb.urlList[0] || '';
       }
 
       const giftEvent = {
         id: `gift-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
-        uniqueId: cleanUsername(data?.uniqueId),
-        nickname: cleanUsername(data?.nickname || data?.uniqueId),
-        profilePictureUrl: data?.profilePictureUrl || '',
-        gift: sanitizedGift,
-        repeatCount: sanitizedGift.repeatCount,
-        repeatEnd: Boolean(data?.repeatEnd),
-        diamonds: sanitizedGift.diamondCount,
+        uniqueId: cleanUsername(user?.displayId || user?.nickname || 'gifter'),
+        nickname: cleanUsername(user?.nickname || user?.displayId || 'Gifter'),
+        profilePictureUrl: avatarUrl,
+        gift: {
+          giftId: Number(giftData?.id) || 0,
+          giftName: sanitizeComment(giftData?.name || 'Gift'),
+          diamondCount,
+          repeatCount,
+          repeatEnd: isOver,
+          giftPictureUrl: giftIcon
+        },
+        repeatCount,
+        repeatEnd: isOver,
+        diamonds,
         timestamp: Date.now()
       };
 
@@ -174,18 +230,19 @@ class TikTokLiveService extends EventEmitter {
     });
 
     // Likes
-    this.connection.on('like', (data) => {
-      const addedLikes = Number(data?.likeCount) || 1;
+    this.client.on(EventType.like, (data) => {
+      const addedLikes = Number(data?.count) || 1;
       this.stats.sessionLikes += addedLikes;
-      if (data?.totalLikeCount) {
-        this.stats.totalLikes = Math.max(this.stats.totalLikes, Number(data.totalLikeCount));
+      if (data?.total) {
+        this.stats.totalLikes = Math.max(this.stats.totalLikes, Number(data.total));
       } else {
         this.stats.totalLikes += addedLikes;
       }
 
+      const user = data?.user || {};
       const likeEvent = {
-        uniqueId: cleanUsername(data?.uniqueId),
-        nickname: cleanUsername(data?.nickname || data?.uniqueId),
+        uniqueId: cleanUsername(user?.displayId || user?.nickname || 'user'),
+        nickname: cleanUsername(user?.nickname || user?.displayId || 'User'),
         likeCount: addedLikes,
         totalLikes: this.stats.totalLikes,
         timestamp: Date.now()
@@ -195,9 +252,9 @@ class TikTokLiveService extends EventEmitter {
       this.emit('stats_update', this.getStatus());
     });
 
-    // Room User / Viewers
-    this.connection.on('roomUser', (data) => {
-      const count = Number(data?.viewerCount) || 0;
+    // Room User Seq (Viewers)
+    this.client.on(EventType.roomUserSeq, (data) => {
+      const count = Number(data?.total) || 0;
       this.stats.viewerCount = count;
       if (count > this.stats.peakViewers) {
         this.stats.peakViewers = count;
@@ -211,30 +268,8 @@ class TikTokLiveService extends EventEmitter {
       this.emit('stats_update', this.getStatus());
     });
 
-    // User Joined
-    this.connection.on('member', (data) => {
-      const memberEvent = {
-        uniqueId: cleanUsername(data?.uniqueId),
-        nickname: cleanUsername(data?.nickname || data?.uniqueId),
-        profilePictureUrl: data?.profilePictureUrl || '',
-        timestamp: Date.now()
-      };
-      this.emit('member', memberEvent);
-    });
-
-    // User Shared or Followed
-    this.connection.on('social', (data) => {
-      const socialEvent = {
-        uniqueId: cleanUsername(data?.uniqueId),
-        nickname: cleanUsername(data?.nickname || data?.uniqueId),
-        action: data?.displayType || 'social',
-        timestamp: Date.now()
-      };
-      this.emit('social', socialEvent);
-    });
-
     // Stream Ended
-    this.connection.on('streamEnd', () => {
+    this.client.on(EventType.liveEnded, () => {
       this.status = 'DISCONNECTED';
       this.emit('streamEnd', {
         message: 'Live stream telah berakhir oleh host.',
@@ -244,7 +279,7 @@ class TikTokLiveService extends EventEmitter {
     });
 
     // Disconnected
-    this.connection.on('disconnected', () => {
+    this.client.on(EventType.disconnected, () => {
       if (!this.isManualDisconnect && this.status === 'CONNECTED') {
         this._handleAutoReconnect();
       } else {
@@ -254,9 +289,10 @@ class TikTokLiveService extends EventEmitter {
     });
 
     // Error
-    this.connection.on('error', (err) => {
+    this.client.on('error', (err) => {
+      const errMsg = this._formatErrorMessage(err);
       this.emit('error', {
-        message: err?.message || 'Kesalahan koneksi live TikTok',
+        message: errMsg,
         detail: String(err)
       });
     });
@@ -275,7 +311,7 @@ class TikTokLiveService extends EventEmitter {
 
     this.reconnectAttempts++;
     this.status = 'RECONNECTING';
-    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 15000);
+    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 10000);
 
     this.emit('reconnecting', {
       attempt: this.reconnectAttempts,
@@ -290,9 +326,7 @@ class TikTokLiveService extends EventEmitter {
         if (this.uniqueId && !this.isManualDisconnect) {
           await this.connect(this.uniqueId, this.options);
         }
-      } catch (err) {
-        // Auto-reconnect failure will trigger another cycle if not at max
-      }
+      } catch (err) {}
     }, delay);
   }
 
@@ -300,13 +334,11 @@ class TikTokLiveService extends EventEmitter {
     this.isManualDisconnect = true;
     clearTimeout(this.reconnectTimer);
 
-    if (this.connection) {
+    if (this.client) {
       try {
-        await this.connection.disconnect();
-      } catch (e) {
-        // Ignore disconnect errors
-      }
-      this.connection = null;
+        this.client.disconnect();
+      } catch (e) {}
+      this.client = null;
     }
 
     this.status = 'DISCONNECTED';

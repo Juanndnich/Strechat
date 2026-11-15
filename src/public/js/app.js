@@ -21,7 +21,7 @@
       totalComments: 0,
       uptimeSeconds: 0
     },
-    filter: 'all', // all | gifts | questions | mods
+    filter: 'all', // all | questions | mods
     searchQuery: '',
     isAutoScroll: true,
     pinnedMessage: null,
@@ -71,8 +71,7 @@
     remoteUrlText: document.getElementById('remote-url-text'),
     btnCopyRemote: document.getElementById('btn-copy-remote'),
     settingSound: document.getElementById('setting-sound'),
-    settingTts: document.getElementById('setting-tts'),
-    settingTtsGifts: document.getElementById('setting-tts-gifts')
+    settingTts: document.getElementById('setting-tts')
   };
 
   // Helper: Format large numbers (e.g. 15420 -> 15.4K)
@@ -116,7 +115,6 @@
       state.ws = new WebSocket(wsUrl);
 
       state.ws.onopen = () => {
-        // Measure ping
         measurePing();
       };
 
@@ -219,6 +217,7 @@
 
       case 'error':
         showNotification(data?.message || 'Terjadi kesalahan pada live stream', 'error');
+        setUIConnectedState(false);
         break;
 
       case 'streamEnd':
@@ -332,7 +331,9 @@
         <div class="chat-text">${chat.comment}</div>
       </div>
       <div class="chat-actions">
-        <button class="chat-action-btn btn-pin-item" title="Sematkan Pesan">📌 Pin</button>
+        <button class="chat-action-btn btn-pin-item" title="Sematkan Pesan">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: -1px; margin-right: 3px;"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>Pin
+        </button>
       </div>
     `;
 
@@ -345,17 +346,14 @@
       });
     }
 
-    // Apply Filter Visibility
     applyItemFilter(item);
-
     el.chatContainer.appendChild(item);
 
-    // Bounded buffer: remove oldest items if exceeding 300
+    // Limit buffer to preserve 60fps
     if (el.chatContainer.children.length > 300) {
       el.chatContainer.removeChild(el.chatContainer.firstElementChild);
     }
 
-    // Smooth auto scroll
     if (state.isAutoScroll) {
       el.chatContainer.scrollTop = el.chatContainer.scrollHeight;
     }
@@ -369,7 +367,7 @@
     const heartIcon = document.querySelector('.metric-card.likes svg');
     if (heartIcon) {
       heartIcon.classList.remove('heart-pulse');
-      void heartIcon.offsetWidth; // trigger reflow
+      void heartIcon.offsetWidth;
       heartIcon.classList.add('heart-pulse');
     }
   }
@@ -404,7 +402,7 @@
 
     let giftImg = gift.giftPictureUrl
       ? `<img class="gift-icon-img" src="${gift.giftPictureUrl}" alt="${gift.giftName}">`
-      : `🎁`;
+      : `<svg class="gift-icon-img" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>`;
 
     const comboHtml = data.repeatCount > 1
       ? `<span class="gift-combo-badge">x${data.repeatCount}</span>`
@@ -415,7 +413,7 @@
         ${avatarSrc}
         <div class="gift-info">
           <span class="gift-sender">${data.nickname}</span>
-          <span class="gift-desc">Mengirim <strong>${gift.giftName}</strong> (${diamonds} 💎)</span>
+          <span class="gift-desc">Mengirim <strong>${gift.giftName}</strong> (${diamonds} Diamond)</span>
         </div>
       </div>
       <div class="gift-banner-right">
@@ -426,7 +424,6 @@
 
     el.giftBannerArea.appendChild(banner);
 
-    // Auto remove banner after 4.5 seconds
     setTimeout(() => {
       banner.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
       banner.style.opacity = '0';
@@ -476,18 +473,21 @@
     const toast = document.createElement('div');
     toast.style.cssText = `
       position: fixed;
-      bottom: 20px;
+      bottom: 24px;
       left: 50%;
       transform: translateX(-50%);
       background: ${type === 'error' ? '#e11d48' : '#4f46e5'};
       color: #fff;
-      padding: 8px 16px;
+      padding: 10px 18px;
       border-radius: 9999px;
       font-size: 12px;
       font-weight: 500;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
       z-index: 999;
       animation: slideInUp 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     `;
     toast.textContent = msg;
     document.body.appendChild(toast);
@@ -495,7 +495,7 @@
       toast.style.opacity = '0';
       toast.style.transition = 'opacity 0.3s';
       setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 3500);
   }
 
   // Fetch Server & Network Info
@@ -550,13 +550,13 @@
         state.isDemo = false;
         el.btnDemo.classList.remove('active');
         setUIConnectedState(false);
-        showNotification('Demo mode dimatikan.', 'info');
+        showNotification('Demo mode nonaktif.', 'info');
       } else {
         state.isDemo = true;
         el.btnDemo.classList.add('active');
         setUIConnectedState(true);
-        state.uniqueId = 'demo_user';
-        showNotification('Demo mode aktif (simulasi stream).', 'info');
+        state.uniqueId = 'demo_streamer';
+        showNotification('Demo mode aktif (simulasi data stream).', 'info');
         window.demoEngine.start((type, data) => {
           handleIncomingPacket({ type, data, timestamp: Date.now() });
         });
@@ -623,7 +623,7 @@
     el.btnCopyRemote.addEventListener('click', () => {
       const url = el.remoteUrlText.textContent;
       navigator.clipboard.writeText(url).then(() => {
-        showNotification('Tautan remote disalin ke clipboard!', 'info');
+        showNotification('Tautan remote berhasil disalin', 'info');
       });
     });
 
@@ -653,7 +653,6 @@
         });
       }
     } else {
-      // In browser / LAN mode, hide window controls
       if (el.titlebar) {
         const controls = el.titlebar.querySelector('.titlebar-controls');
         if (controls) controls.style.display = 'none';

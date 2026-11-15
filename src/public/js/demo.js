@@ -9,24 +9,24 @@ class DemoEngine {
     this.timers = [];
     this.mockUsers = [
       { name: 'budi_santoso', nick: 'Budi Gaming', mod: false, sub: true },
-      { name: 'siti_zahra', nick: 'Zahra 🌸', mod: true, sub: true },
+      { name: 'siti_zahra', nick: 'Zahra Stream', mod: true, sub: true },
       { name: 'dimas_pratama', nick: 'Dimas Pro', mod: false, sub: false },
-      { name: 'anisa_bella', nick: 'Bella Cute ✨', mod: false, sub: false },
+      { name: 'anisa_bella', nick: 'Bella Cute', mod: false, sub: false },
       { name: 'rizky_stream', nick: 'Rizky', mod: false, sub: true },
       { name: 'teuku_umar', nick: 'Teuku U', mod: false, sub: false },
-      { name: 'citra_ayu', nick: 'Citra Ayu 💖', mod: false, sub: false }
+      { name: 'citra_ayu', nick: 'Citra Ayu', mod: false, sub: false }
     ];
 
     this.mockComments = [
-      'Halo bang, semangat live nya! 🔥',
+      'Halo bang, semangat live streamingnya!',
       'Kapan main game bareng penonton?',
-      'Keren banget setup komputernya! 👏',
+      'Keren banget setup komputernya!',
       'Lagi di daerah mana bang sekarang?',
-      'Follow balik dong bang pleaseee',
-      'Wah lancar banget tanpa delay aplikasinya! 😍',
+      'Follow balik dong bang please',
+      'Wah lancar banget tanpa delay aplikasinya!',
       'Bagi tips dong buat pemula',
-      'Gaspol terusss bang! 🚀',
-      'Kok sepi? Yuk tap tap layar tembusin 10k like!'
+      'Gaspol terus bang!',
+      'Yuk tap tap layar tembusin 10k like!'
     ];
 
     this.mockGifts = [
@@ -45,7 +45,7 @@ class DemoEngine {
     // Initial state
     onEvent('status', {
       status: 'CONNECTED',
-      uniqueId: 'demo_user',
+      uniqueId: 'demo_streamer',
       stats: {
         viewerCount: 840,
         peakViewers: 1250,
