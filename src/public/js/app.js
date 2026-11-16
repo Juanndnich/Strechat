@@ -71,7 +71,39 @@
     remoteUrlText: document.getElementById('remote-url-text'),
     btnCopyRemote: document.getElementById('btn-copy-remote'),
     settingSound: document.getElementById('setting-sound'),
-    settingTts: document.getElementById('setting-tts')
+    settingTts: document.getElementById('setting-tts'),
+    // Account & Session
+    settingSessionId: document.getElementById('setting-session-id'),
+    btnToggleSession: document.getElementById('btn-toggle-session-visibility'),
+    btnClearSession: document.getElementById('btn-clear-session'),
+    settingAutoConnect: document.getElementById('setting-auto-connect'),
+    // Streamer Profiles
+    btnProfiles: document.getElementById('btn-profiles'),
+    modalProfiles: document.getElementById('modal-profiles'),
+    btnCloseProfiles: document.getElementById('btn-close-profiles'),
+    profilesList: document.getElementById('profiles-list'),
+    newProfileInput: document.getElementById('new-profile-input'),
+    btnAddProfile: document.getElementById('btn-add-profile'),
+    // Overlay Studio
+    btnOverlayStudio: document.getElementById('btn-overlay-studio'),
+    modalOverlayStudio: document.getElementById('modal-overlay-studio'),
+    btnCloseStudio: document.getElementById('btn-close-studio'),
+    studioThemePresets: document.getElementById('studio-theme-presets'),
+    studioFontSelect: document.getElementById('studio-font-select'),
+    studioSizeSlider: document.getElementById('studio-size-slider'),
+    studioSizeVal: document.getElementById('studio-size-val'),
+    studioColorBg: document.getElementById('studio-color-bg'),
+    studioColorName: document.getElementById('studio-color-name'),
+    studioColorText: document.getElementById('studio-color-text'),
+    studioAnimSelect: document.getElementById('studio-anim-select'),
+    studioFadeSlider: document.getElementById('studio-fade-slider'),
+    studioFadeVal: document.getElementById('studio-fade-val'),
+    studioToggleAvatar: document.getElementById('studio-toggle-avatar'),
+    studioToggleBadges: document.getElementById('studio-toggle-badges'),
+    studioGeneratedUrl: document.getElementById('studio-generated-url'),
+    btnCopyCustomOverlay: document.getElementById('btn-copy-custom-overlay'),
+    btnStudioMockMsg: document.getElementById('btn-studio-mock-msg'),
+    studioPreviewFeed: document.getElementById('studio-preview-feed')
   };
 
   // Helper: Format large numbers (e.g. 15420 -> 15.4K)
@@ -116,6 +148,15 @@
 
       state.ws.onopen = () => {
         measurePing();
+        const settings = loadSettings();
+        if (settings.autoConnect && settings.lastUsername && !state.connected) {
+          el.channelInput.value = settings.lastUsername;
+          setTimeout(() => {
+            if (!state.connected) {
+              el.btnConnect.click();
+            }
+          }, 400);
+        }
       };
 
       state.ws.onmessage = (event) => {
@@ -719,7 +760,11 @@
           el.channelInput.focus();
           return;
         }
-        sendWsAction('connect', { username });
+        const settings = loadSettings();
+        const sessionId = settings.sessionId || '';
+        sendWsAction('connect', { username, sessionId });
+        saveSettings({ lastUsername: username });
+        addProfile(username);
         el.statusDot.className = 'status-dot connecting';
         el.statusText.textContent = 'Menghubungkan...';
       }
@@ -989,6 +1034,419 @@
         showNotification(state.isAlwaysOnTop ? 'Mode Pin aktif (Selalu di atas)' : 'Mode Pin nonaktif', 'info');
       });
     }
+
+    // Account & Secure Session ID
+    if (el.settingSessionId) {
+      el.settingSessionId.addEventListener('input', (e) => {
+        saveSettings({ sessionId: e.target.value.trim() });
+      });
+    }
+
+    if (el.btnToggleSession && el.settingSessionId) {
+      el.btnToggleSession.addEventListener('click', () => {
+        const isPass = el.settingSessionId.type === 'password';
+        el.settingSessionId.type = isPass ? 'text' : 'password';
+      });
+    }
+
+    if (el.btnClearSession && el.settingSessionId) {
+      el.btnClearSession.addEventListener('click', () => {
+        el.settingSessionId.value = '';
+        saveSettings({ sessionId: '' });
+        showNotification('Session ID telah dihapus', 'info');
+      });
+    }
+
+    if (el.settingAutoConnect) {
+      el.settingAutoConnect.addEventListener('change', (e) => {
+        saveSettings({ autoConnect: e.target.checked });
+      });
+    }
+
+    // Streamer Profiles Modal
+    if (el.btnProfiles && el.modalProfiles) {
+      el.btnProfiles.addEventListener('click', () => {
+        renderProfiles();
+        el.modalProfiles.classList.add('open');
+      });
+    }
+
+    if (el.btnCloseProfiles && el.modalProfiles) {
+      el.btnCloseProfiles.addEventListener('click', () => {
+        el.modalProfiles.classList.remove('open');
+      });
+    }
+
+    if (el.modalProfiles) {
+      el.modalProfiles.addEventListener('click', (e) => {
+        if (e.target === el.modalProfiles) {
+          el.modalProfiles.classList.remove('open');
+        }
+      });
+    }
+
+    if (el.btnAddProfile && el.newProfileInput) {
+      const handleAddProfile = () => {
+        const val = el.newProfileInput.value.trim().replace(/^@+/, '');
+        if (!val) {
+          showNotification('Ketik username TikTok terlebih dahulu', 'error');
+          return;
+        }
+        addProfile(val);
+        el.newProfileInput.value = '';
+        showNotification(`Profil @${val} berhasil disimpan`, 'info');
+      };
+
+      el.btnAddProfile.addEventListener('click', handleAddProfile);
+      el.newProfileInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleAddProfile();
+      });
+    }
+
+    // Overlay Studio Modal & Controls
+    if (el.btnOverlayStudio && el.modalOverlayStudio) {
+      el.btnOverlayStudio.addEventListener('click', () => {
+        updateStudioPreview();
+        el.modalOverlayStudio.classList.add('open');
+      });
+    }
+
+    if (el.btnCloseStudio && el.modalOverlayStudio) {
+      el.btnCloseStudio.addEventListener('click', () => {
+        el.modalOverlayStudio.classList.remove('open');
+      });
+    }
+
+    if (el.modalOverlayStudio) {
+      el.modalOverlayStudio.addEventListener('click', (e) => {
+        if (e.target === el.modalOverlayStudio) {
+          el.modalOverlayStudio.classList.remove('open');
+        }
+      });
+    }
+
+    if (el.studioThemePresets) {
+      const themeBtns = el.studioThemePresets.querySelectorAll('.pill-btn');
+      themeBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          themeBtns.forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          const t = btn.dataset.theme;
+          studioState.theme = t;
+          const def = THEME_DEFAULTS[t] || THEME_DEFAULTS.classic;
+          studioState.bg = def.bg;
+          studioState.nameColor = def.nameColor;
+          studioState.textColor = def.textColor;
+
+          if (el.studioColorBg && !def.bg.startsWith('rgba') && def.bg !== 'transparent') {
+            el.studioColorBg.value = def.bg;
+          }
+          if (el.studioColorName) el.studioColorName.value = def.nameColor;
+          if (el.studioColorText) el.studioColorText.value = def.textColor;
+
+          updateStudioPreview();
+        });
+      });
+    }
+
+    if (el.studioFontSelect) {
+      el.studioFontSelect.addEventListener('change', (e) => {
+        studioState.font = e.target.value;
+        updateStudioPreview();
+      });
+    }
+
+    if (el.studioSizeSlider && el.studioSizeVal) {
+      el.studioSizeSlider.addEventListener('input', (e) => {
+        studioState.size = Number(e.target.value);
+        el.studioSizeVal.textContent = e.target.value;
+        updateStudioPreview();
+      });
+    }
+
+    if (el.studioColorBg) {
+      el.studioColorBg.addEventListener('input', (e) => {
+        studioState.bg = e.target.value;
+        updateStudioPreview();
+      });
+    }
+
+    if (el.studioColorName) {
+      el.studioColorName.addEventListener('input', (e) => {
+        studioState.nameColor = e.target.value;
+        updateStudioPreview();
+      });
+    }
+
+    if (el.studioColorText) {
+      el.studioColorText.addEventListener('input', (e) => {
+        studioState.textColor = e.target.value;
+        updateStudioPreview();
+      });
+    }
+
+    if (el.studioAnimSelect) {
+      el.studioAnimSelect.addEventListener('change', (e) => {
+        studioState.anim = e.target.value;
+        updateStudioPreview();
+      });
+    }
+
+    if (el.studioFadeSlider && el.studioFadeVal) {
+      el.studioFadeSlider.addEventListener('input', (e) => {
+        const val = Number(e.target.value);
+        studioState.fade = val;
+        el.studioFadeVal.textContent = val === 0 ? 'Mati' : `${val}s`;
+        updateStudioPreview();
+      });
+    }
+
+    if (el.studioToggleAvatar) {
+      el.studioToggleAvatar.addEventListener('change', (e) => {
+        studioState.hideAvatar = !e.target.checked;
+        updateStudioPreview();
+      });
+    }
+
+    if (el.studioToggleBadges) {
+      el.studioToggleBadges.addEventListener('change', (e) => {
+        studioState.hideBadges = !e.target.checked;
+        updateStudioPreview();
+      });
+    }
+
+    if (el.btnStudioMockMsg) {
+      el.btnStudioMockMsg.addEventListener('click', () => {
+        spawnStudioMockMessage();
+      });
+    }
+
+    if (el.btnCopyCustomOverlay && el.studioGeneratedUrl) {
+      el.btnCopyCustomOverlay.addEventListener('click', () => {
+        const url = el.studioGeneratedUrl.textContent;
+        navigator.clipboard.writeText(url).then(() => {
+          showNotification('Tautan Kustom Overlay OBS berhasil disalin!', 'info');
+        }).catch(() => {
+          showNotification('Gagal menyalin tautan', 'error');
+        });
+      });
+    }
+  }
+
+  // HTML sanitization helper
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // ==========================================================================
+  // Streamer Profiles Manager
+  // ==========================================================================
+  const PROFILES_KEY = 'strechat_profiles';
+
+  function loadProfiles() {
+    try {
+      const raw = localStorage.getItem(PROFILES_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveProfiles(profiles) {
+    try {
+      localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
+    } catch (e) {
+      console.warn('[strechat] Gagal menyimpan profil:', e);
+    }
+  }
+
+  function renderProfiles() {
+    if (!el.profilesList) return;
+    const profiles = loadProfiles();
+    el.profilesList.innerHTML = '';
+
+    if (profiles.length === 0) {
+      el.profilesList.innerHTML = `
+        <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;">
+          Belum ada profil tersimpan. Masukkan username di bawah untuk menyimpan profil pertama Anda.
+        </div>
+      `;
+      return;
+    }
+
+    profiles.forEach((username) => {
+      const card = document.createElement('div');
+      card.className = 'profile-card';
+      const initial = (username[0] || 'T').toUpperCase();
+      card.innerHTML = `
+        <div class="profile-card-left" title="Gunakan akun @${escapeHtml(username)}">
+          <div class="profile-card-avatar">${initial}</div>
+          <span class="profile-card-name">@${escapeHtml(username)}</span>
+        </div>
+        <button class="profile-card-del" title="Hapus profil" data-user="${escapeHtml(username)}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+      `;
+
+      card.querySelector('.profile-card-left').addEventListener('click', () => {
+        el.channelInput.value = username;
+        saveSettings({ lastUsername: username });
+        if (el.modalProfiles) el.modalProfiles.classList.remove('open');
+        showNotification(`Profil @${username} dipilih`, 'info');
+      });
+
+      card.querySelector('.profile-card-del').addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteProfile(username);
+      });
+
+      el.profilesList.appendChild(card);
+    });
+  }
+
+  function addProfile(rawUsername) {
+    const username = (rawUsername || '').trim().replace(/^@+/, '');
+    if (!username) return;
+    const profiles = loadProfiles();
+    if (!profiles.includes(username)) {
+      profiles.unshift(username);
+      if (profiles.length > 20) profiles.pop();
+      saveProfiles(profiles);
+      renderProfiles();
+    }
+  }
+
+  function deleteProfile(username) {
+    let profiles = loadProfiles();
+    profiles = profiles.filter(p => p !== username);
+    saveProfiles(profiles);
+    renderProfiles();
+    showNotification(`Profil @${username} dihapus`, 'info');
+  }
+
+  // ==========================================================================
+  // In-App Overlay Studio Designer
+  // ==========================================================================
+  const studioState = {
+    theme: 'classic',
+    font: 'Poppins',
+    size: 13,
+    bg: '#0f111a',
+    nameColor: '#38bdf8',
+    textColor: '#f1f5f9',
+    anim: 'pop',
+    fade: 12,
+    hideAvatar: false,
+    hideBadges: false
+  };
+
+  const THEME_DEFAULTS = {
+    classic: { bg: '#0f111a', nameColor: '#38bdf8', textColor: '#f1f5f9', radius: '12px', border: '1px solid rgba(255, 255, 255, 0.12)' },
+    pill: { bg: 'rgba(20, 24, 39, 0.9)', nameColor: '#60a5fa', textColor: '#f8fafc', radius: '9999px', border: '1px solid rgba(255, 255, 255, 0.15)' },
+    glass: { bg: 'rgba(255, 255, 255, 0.08)', nameColor: '#a5f3fc', textColor: '#ffffff', radius: '14px', border: '1px solid rgba(255, 255, 255, 0.22)' },
+    neon: { bg: 'rgba(10, 10, 18, 0.95)', nameColor: '#00f0ff', textColor: '#f0abfc', radius: '10px', border: '1px solid #00f0ff' },
+    borderless: { bg: 'transparent', nameColor: '#facc15', textColor: '#ffffff', radius: '0px', border: 'none' }
+  };
+
+  function updateStudioPreview() {
+    if (!el.studioPreviewFeed) return;
+    const themeDef = THEME_DEFAULTS[studioState.theme] || THEME_DEFAULTS.classic;
+
+    el.studioPreviewFeed.style.setProperty('--studio-bg', studioState.bg);
+    el.studioPreviewFeed.style.setProperty('--studio-name', studioState.nameColor);
+    el.studioPreviewFeed.style.setProperty('--studio-text', studioState.textColor);
+    el.studioPreviewFeed.style.setProperty('--studio-font', `'${studioState.font}', -apple-system, sans-serif`);
+    el.studioPreviewFeed.style.setProperty('--studio-size', `${studioState.size}px`);
+    el.studioPreviewFeed.style.setProperty('--studio-radius', themeDef.radius);
+    el.studioPreviewFeed.style.setProperty('--studio-border', themeDef.border);
+
+    // Toggle avatars & badges in preview feed
+    el.studioPreviewFeed.querySelectorAll('.overlay-avatar-placeholder').forEach(av => {
+      av.style.display = studioState.hideAvatar ? 'none' : 'flex';
+    });
+    el.studioPreviewFeed.querySelectorAll('.overlay-badge').forEach(badge => {
+      badge.style.display = studioState.hideBadges ? 'none' : 'inline-block';
+    });
+
+    // Update animations on existing preview items
+    el.studioPreviewFeed.querySelectorAll('.overlay-item').forEach(item => {
+      item.className = item.className.replace(/\banim-\w+/g, '') + ` anim-${studioState.anim}`;
+    });
+
+    updateStudioUrl();
+  }
+
+  function updateStudioUrl() {
+    if (!el.studioGeneratedUrl) return;
+    const origin = window.location.origin;
+    const params = new URLSearchParams();
+
+    if (studioState.theme !== 'classic') params.set('theme', studioState.theme);
+    if (studioState.font !== 'Poppins') params.set('font', studioState.font);
+    if (Number(studioState.size) !== 13) params.set('size', studioState.size);
+    if (studioState.bg !== THEME_DEFAULTS[studioState.theme]?.bg) params.set('bg', studioState.bg);
+    if (studioState.nameColor !== THEME_DEFAULTS[studioState.theme]?.nameColor) params.set('nameColor', studioState.nameColor);
+    if (studioState.textColor !== THEME_DEFAULTS[studioState.theme]?.textColor) params.set('textColor', studioState.textColor);
+    if (studioState.anim !== 'pop') params.set('anim', studioState.anim);
+    if (Number(studioState.fade) !== 12) params.set('fade', studioState.fade);
+    if (studioState.hideAvatar) params.set('hideAvatar', 'true');
+    if (studioState.hideBadges) params.set('hideBadges', 'true');
+
+    const qs = params.toString();
+    el.studioGeneratedUrl.textContent = `${origin}/overlay${qs ? '?' + qs : ''}`;
+  }
+
+  const MOCK_USERS = [
+    { name: 'Rian Pratama', text: 'Overlaynya keren banget bang! 🔥' },
+    { name: 'Siti Rahma', text: 'Semangat terus live-nya kakak cantik! ✨' },
+    { name: 'Dimas Gaming', text: 'Bang main game bareng penonton donggg' },
+    { name: 'Aldo Wijaya', text: 'Halo semua penonton setia! Absen dari Surabaya' }
+  ];
+
+  function spawnStudioMockMessage() {
+    if (!el.studioPreviewFeed) return;
+    const randomUser = MOCK_USERS[Math.floor(Math.random() * MOCK_USERS.length)];
+    const item = document.createElement('div');
+    item.className = `overlay-item anim-${studioState.anim}`;
+
+    const initial = (randomUser.name[0] || 'U').toUpperCase();
+    item.innerHTML = `
+      <div class="overlay-avatar-placeholder" style="${studioState.hideAvatar ? 'display: none;' : ''}">${initial}</div>
+      <div class="overlay-body">
+        <div class="overlay-header">
+          <span class="overlay-nickname">${escapeHtml(randomUser.name)}</span>
+          <span class="overlay-badge badge-mod" style="${studioState.hideBadges ? 'display: none;' : ''}">USER</span>
+        </div>
+        <div class="overlay-text">${escapeHtml(randomUser.text)}</div>
+      </div>
+    `;
+
+    el.studioPreviewFeed.appendChild(item);
+
+    // Limit preview items to 4
+    const items = el.studioPreviewFeed.querySelectorAll('.overlay-item');
+    if (items.length > 4) {
+      items[0].remove();
+    }
+
+    // Auto-fade simulation if fade > 0
+    if (Number(studioState.fade) > 0) {
+      setTimeout(() => {
+        if (item.parentNode) {
+          item.style.opacity = '0';
+          item.style.transform = 'translateY(-10px)';
+          setTimeout(() => item.remove(), 400);
+        }
+      }, Number(studioState.fade) * 1000);
+    }
   }
 
   // Settings Persistence Helper with safe error handling and defaults
@@ -997,7 +1455,10 @@
     soundEnabled: true,
     ttsEnabled: false,
     chatFontSize: 'normal',
-    bannedWords: ''
+    bannedWords: '',
+    sessionId: '',
+    autoConnect: false,
+    lastUsername: ''
   };
 
   let bannedWordsList = [];
@@ -1040,7 +1501,10 @@
         soundEnabled: typeof parsed?.soundEnabled === 'boolean' ? parsed.soundEnabled : DEFAULT_SETTINGS.soundEnabled,
         ttsEnabled: typeof parsed?.ttsEnabled === 'boolean' ? parsed.ttsEnabled : DEFAULT_SETTINGS.ttsEnabled,
         chatFontSize: validSizes.includes(parsed?.chatFontSize) ? parsed.chatFontSize : DEFAULT_SETTINGS.chatFontSize,
-        bannedWords: typeof parsed?.bannedWords === 'string' ? parsed.bannedWords : DEFAULT_SETTINGS.bannedWords
+        bannedWords: typeof parsed?.bannedWords === 'string' ? parsed.bannedWords : DEFAULT_SETTINGS.bannedWords,
+        sessionId: typeof parsed?.sessionId === 'string' ? parsed.sessionId : DEFAULT_SETTINGS.sessionId,
+        autoConnect: typeof parsed?.autoConnect === 'boolean' ? parsed.autoConnect : DEFAULT_SETTINGS.autoConnect,
+        lastUsername: typeof parsed?.lastUsername === 'string' ? parsed.lastUsername : DEFAULT_SETTINGS.lastUsername
       };
     } catch (e) {
       console.warn('[strechat] Gagal membaca pengaturan dari localStorage, menggunakan default:', e);
@@ -1082,9 +1546,22 @@
       updateBannedWordsList(settings.bannedWords);
     }
 
+    // Restore Session ID, Auto-Connect, and Last Username
+    if (el.settingSessionId && settings.sessionId) {
+      el.settingSessionId.value = settings.sessionId;
+    }
+    if (el.settingAutoConnect) {
+      el.settingAutoConnect.checked = !!settings.autoConnect;
+    }
+    if (settings.lastUsername && el.channelInput) {
+      el.channelInput.value = settings.lastUsername;
+    }
+
     setupEventListeners();
     initWebSocket();
     loadServerInfo();
+    renderProfiles();
+    updateStudioUrl();
   }
 
   document.addEventListener('DOMContentLoaded', init);

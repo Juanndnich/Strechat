@@ -6,7 +6,21 @@
   <title>strechat - OBS Overlay</title>
   <link rel="icon" type="image/png" href="icons/icon.png">
   <link rel="stylesheet" href="css/poppins.css">
-  <style>
+  <style id="overlay-custom-styles">
+    :root {
+      --overlay-bg: rgba(15, 17, 26, 0.85);
+      --overlay-border: 1px solid rgba(255, 255, 255, 0.12);
+      --overlay-border-radius: 12px;
+      --overlay-font: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --overlay-text-color: #f1f5f9;
+      --overlay-name-color: #38bdf8;
+      --overlay-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      --overlay-backdrop: blur(8px);
+      --overlay-font-size: 13px;
+      --overlay-avatar-size: 32px;
+      --overlay-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -16,7 +30,7 @@
 
     body {
       background: transparent !important;
-      font-family: 'Poppins', sans-serif;
+      font-family: var(--overlay-font);
       width: 100vw;
       height: 100vh;
       overflow: hidden;
@@ -38,23 +52,39 @@
 
     /* Chat bubble */
     .overlay-item {
-      background: rgba(15, 17, 26, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
+      background: var(--overlay-bg);
+      backdrop-filter: var(--overlay-backdrop);
+      -webkit-backdrop-filter: var(--overlay-backdrop);
+      border: var(--overlay-border);
+      border-radius: var(--overlay-border-radius);
       padding: 8px 12px;
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      color: #fff;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      color: var(--overlay-text-color);
+      box-shadow: var(--overlay-shadow);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .anim-pop {
       animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .anim-slide {
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .anim-fade {
+      animation: fadeIn 0.35s ease;
+    }
+
+    .anim-bounce {
+      animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .overlay-avatar {
-      width: 32px;
-      height: 32px;
+      width: var(--overlay-avatar-size);
+      height: var(--overlay-avatar-size);
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
@@ -62,10 +92,11 @@
     }
 
     .overlay-avatar-placeholder {
-      width: 32px;
-      height: 32px;
+      width: var(--overlay-avatar-size);
+      height: var(--overlay-avatar-size);
       border-radius: 50%;
       background: linear-gradient(135deg, #6366f1, #f43f5e);
+      color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -89,8 +120,8 @@
     .overlay-nickname {
       font-size: 12px;
       font-weight: 600;
-      color: #38bdf8;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+      color: var(--overlay-name-color);
+      text-shadow: var(--overlay-text-shadow);
     }
 
     .overlay-badge {
@@ -108,18 +139,18 @@
     }
 
     .overlay-text {
-      font-size: 13px;
+      font-size: var(--overlay-font-size);
       line-height: 1.4;
-      color: #f1f5f9;
+      color: var(--overlay-text-color);
       word-break: break-word;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      text-shadow: var(--overlay-text-shadow);
     }
 
     /* Gift Highlight */
     .overlay-item.overlay-gift {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(244, 63, 94, 0.25));
-      border: 1.5px solid rgba(245, 158, 11, 0.6);
-      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.28), rgba(244, 63, 94, 0.28));
+      border: 1.5px solid rgba(245, 158, 11, 0.65);
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
       animation: giftBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
@@ -144,8 +175,24 @@
     }
 
     @keyframes popIn {
-      from { opacity: 0; transform: translateY(15px) scale(0.95); }
+      from { opacity: 0; transform: translateY(14px) scale(0.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-35px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.8); }
+      60% { transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     @keyframes giftBounce {
@@ -161,9 +208,94 @@
   <script>
     (function () {
       const feed = document.getElementById('overlay-feed');
-      const maxItems = 7;
-      const fadeDurationMs = 12000; // items fade out after 12s
+      const params = new URLSearchParams(window.location.search);
 
+      // Parse configuration from URL query params
+      const theme = params.get('theme') || 'classic';
+      const font = params.get('font');
+      const bg = params.get('bg');
+      const textColor = params.get('textColor');
+      const nameColor = params.get('nameColor');
+      const animType = params.get('anim') || 'pop';
+      const fadeDuration = params.get('fade') !== null ? Math.max(0, parseInt(params.get('fade'), 10)) : 12;
+      const hideAvatar = params.get('hideAvatar') === '1' || params.get('hideAvatar') === 'true';
+      const hideBadges = params.get('hideBadges') === '1' || params.get('hideBadges') === 'true';
+      const fontSize = params.get('size') ? `${parseInt(params.get('size'), 10)}px` : '13px';
+      const maxItems = params.get('maxItems') ? Math.min(25, Math.max(1, parseInt(params.get('maxItems'), 10))) : 7;
+
+      // Apply Theme Presets
+      const root = document.documentElement;
+      function applyTheme(t) {
+        switch (t) {
+          case 'pill':
+            root.style.setProperty('--overlay-bg', 'rgba(18, 22, 34, 0.92)');
+            root.style.setProperty('--overlay-border', '1px solid rgba(99, 102, 241, 0.35)');
+            root.style.setProperty('--overlay-border-radius', '9999px');
+            root.style.setProperty('--overlay-name-color', '#818cf8');
+            root.style.setProperty('--overlay-shadow', '0 4px 14px rgba(0, 0, 0, 0.35)');
+            root.style.setProperty('--overlay-backdrop', 'blur(6px)');
+            break;
+          case 'glass':
+            root.style.setProperty('--overlay-bg', 'rgba(255, 255, 255, 0.1)');
+            root.style.setProperty('--overlay-border', '1px solid rgba(255, 255, 255, 0.25)');
+            root.style.setProperty('--overlay-border-radius', '14px');
+            root.style.setProperty('--overlay-name-color', '#67e8f9');
+            root.style.setProperty('--overlay-shadow', '0 8px 32px rgba(0, 0, 0, 0.35)');
+            root.style.setProperty('--overlay-backdrop', 'blur(16px)');
+            break;
+          case 'neon':
+            root.style.setProperty('--overlay-bg', 'rgba(10, 10, 18, 0.94)');
+            root.style.setProperty('--overlay-border', '1.5px solid #6366f1');
+            root.style.setProperty('--overlay-border-radius', '10px');
+            root.style.setProperty('--overlay-name-color', '#a78bfa');
+            root.style.setProperty('--overlay-shadow', '0 0 16px rgba(99, 102, 241, 0.55), inset 0 0 10px rgba(99, 102, 241, 0.15)');
+            root.style.setProperty('--overlay-backdrop', 'none');
+            break;
+          case 'borderless':
+            root.style.setProperty('--overlay-bg', 'transparent');
+            root.style.setProperty('--overlay-border', 'none');
+            root.style.setProperty('--overlay-border-radius', '0');
+            root.style.setProperty('--overlay-name-color', '#38bdf8');
+            root.style.setProperty('--overlay-shadow', 'none');
+            root.style.setProperty('--overlay-backdrop', 'none');
+            root.style.setProperty('--overlay-text-shadow', '0 2px 4px rgba(0, 0, 0, 0.95), 0 0 3px #000');
+            break;
+          case 'classic':
+          default:
+            root.style.setProperty('--overlay-bg', 'rgba(15, 17, 26, 0.85)');
+            root.style.setProperty('--overlay-border', '1px solid rgba(255, 255, 255, 0.12)');
+            root.style.setProperty('--overlay-border-radius', '12px');
+            root.style.setProperty('--overlay-name-color', '#38bdf8');
+            root.style.setProperty('--overlay-shadow', '0 4px 15px rgba(0, 0, 0, 0.4)');
+            root.style.setProperty('--overlay-backdrop', 'blur(8px)');
+            break;
+        }
+      }
+
+      applyTheme(theme);
+
+      // Overrides
+      if (bg) root.style.setProperty('--overlay-bg', bg);
+      if (textColor) root.style.setProperty('--overlay-text-color', textColor);
+      if (nameColor) root.style.setProperty('--overlay-name-color', nameColor);
+      if (fontSize) root.style.setProperty('--overlay-font-size', fontSize);
+
+      // Safe Font Family Loader
+      const allowedFonts = ['Poppins', 'Montserrat', 'Roboto', 'Inter', 'Bangers', 'Ubuntu', 'Lato', 'Oswald'];
+      if (font && allowedFonts.includes(font)) {
+        if (font !== 'Poppins') {
+          const fontLink = document.createElement('link');
+          fontLink.rel = 'stylesheet';
+          fontLink.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;600;700&display=swap`;
+          document.head.appendChild(fontLink);
+        }
+        root.style.setProperty('--overlay-font', `'${font}', sans-serif`);
+      }
+
+      // Animation class
+      const animClass = `anim-${['pop', 'slide', 'fade', 'bounce'].includes(animType) ? animType : 'pop'}`;
+
+      // WebSocket Connection
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${protocol}//${window.location.host}/ws`;
 
@@ -186,22 +318,25 @@
 
       function renderChat(chat) {
         const item = document.createElement('div');
-        item.className = 'overlay-item';
+        item.className = `overlay-item ${animClass}`;
 
-        const avatar = chat.profilePictureUrl && chat.profilePictureUrl.startsWith('http')
-          ? `<img class="overlay-avatar" src="${chat.profilePictureUrl}" alt="">`
-          : `<div class="overlay-avatar-placeholder">${chat.nickname.charAt(0).toUpperCase()}</div>`;
+        let avatarHtml = '';
+        if (!hideAvatar) {
+          avatarHtml = chat.profilePictureUrl && chat.profilePictureUrl.startsWith('http')
+            ? `<img class="overlay-avatar" src="${chat.profilePictureUrl}" alt="">`
+            : `<div class="overlay-avatar-placeholder">${(chat.nickname || 'U').charAt(0).toUpperCase()}</div>`;
+        }
 
-        const badge = chat.isModerator
+        const badgeHtml = (!hideBadges && chat.isModerator)
           ? `<span class="overlay-badge badge-mod">MOD</span>`
           : '';
 
         item.innerHTML = `
-          ${avatar}
+          ${avatarHtml}
           <div class="overlay-body">
             <div class="overlay-header">
               <span class="overlay-nickname">${chat.nickname}</span>
-              ${badge}
+              ${badgeHtml}
             </div>
             <div class="overlay-text">${chat.comment}</div>
           </div>
@@ -212,11 +347,14 @@
 
       function renderGift(data) {
         const item = document.createElement('div');
-        item.className = 'overlay-item overlay-gift';
+        item.className = `overlay-item overlay-gift ${animClass}`;
 
-        const avatar = data.profilePictureUrl && data.profilePictureUrl.startsWith('http')
-          ? `<img class="overlay-avatar" src="${data.profilePictureUrl}" alt="">`
-          : `<div class="overlay-avatar-placeholder">${data.nickname.charAt(0).toUpperCase()}</div>`;
+        let avatarHtml = '';
+        if (!hideAvatar) {
+          avatarHtml = data.profilePictureUrl && data.profilePictureUrl.startsWith('http')
+            ? `<img class="overlay-avatar" src="${data.profilePictureUrl}" alt="">`
+            : `<div class="overlay-avatar-placeholder">${(data.nickname || 'G').charAt(0).toUpperCase()}</div>`;
+        }
 
         const combo = data.repeatCount > 1
           ? `<span class="combo-badge">x${data.repeatCount}</span>`
@@ -231,7 +369,7 @@
           : '🎁';
 
         item.innerHTML = `
-          ${avatar}
+          ${avatarHtml}
           <div class="overlay-body">
             <div class="overlay-header">
               <span class="overlay-nickname">${data.nickname}</span>
@@ -254,12 +392,14 @@
           feed.removeChild(feed.firstElementChild);
         }
 
-        // Auto fade out after duration
-        setTimeout(() => {
-          el.style.opacity = '0';
-          el.style.transform = 'translateY(-10px)';
-          setTimeout(() => el.remove(), 500);
-        }, fadeDurationMs);
+        // Auto fade out after duration (if fadeDuration > 0)
+        if (fadeDuration > 0) {
+          setTimeout(() => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(-10px)';
+            setTimeout(() => el.remove(), 400);
+          }, fadeDuration * 1000);
+        }
       }
 
       connect();

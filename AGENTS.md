@@ -486,25 +486,28 @@ Required before public release.
 
 ## PHASE 4 — OBS ECOSYSTEM
 
-- [ ] Chat overlay.
+- [x] Chat overlay (transparent, zero-bloat).
 - [ ] Gift alert overlay.
 - [ ] Viewer counter overlay.
 - [ ] Diamond counter overlay.
 - [ ] Goal tracker overlay.
 - [ ] Leaderboard overlay.
-- [ ] Overlay customization.
-- [ ] Font and color customization.
-- [ ] Animation settings.
-- [ ] Overlay live preview.
-- [ ] Independent overlay URLs.
+- [x] Overlay customization (In-App Overlay Studio).
+- [x] Font and color customization (Google Fonts, custom background, name & text colors).
+- [x] Animation settings (Slide up, Pop in, Fade in, Bounce, configurable auto-fade timer).
+- [x] Overlay live preview (interactive simulation preview in studio).
+- [x] Independent overlay URLs (URL query string / presets for multiple OBS scenes).
+- [x] Preset styles (Classic Box, Modern Pill, Glassmorphism, Neon Glow, Borderless Streamer).
 
 ## PHASE 5 — ADVANCED FEATURES
 
-- [ ] Chat moderation.
+- [x] Chat moderation & blacklist filter.
 - [ ] Keyword alerts.
 - [ ] Spam detection.
 - [ ] Username blocklist.
-- [ ] Multiple streamer profiles.
+- [x] Multiple streamer profiles (saved accounts with 1-click quick switch).
+- [x] Secure TikTok Session Login option (local storage only, support for age-restricted & follower-only streams, zero logging, instant data deletion).
+- [x] Auto-connect / Auto-detect live session.
 - [ ] Advanced gift alerts.
 - [ ] Custom sound effects.
 - [ ] Advanced TTS.

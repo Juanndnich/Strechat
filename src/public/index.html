@@ -45,6 +45,12 @@
       </button>
 
       <div class="header-actions">
+        <button class="btn-icon" id="btn-profiles" title="Profil Akun Streamer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+        <button class="btn-icon" id="btn-overlay-studio" title="Studio Desain Overlay OBS">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+        </button>
         <button class="btn-icon" id="btn-demo" title="Mode Demo / Simulasi">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
         </button>
@@ -193,6 +199,35 @@
       </div>
 
       <div class="modal-body">
+        <!-- Category 0: Akun & Sesi TikTok Aman -->
+        <div class="settings-section">
+          <div class="section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Akun & Sesi TikTok Aman
+          </div>
+          <div class="setting-item vertical">
+            <div class="setting-label">
+              <span class="setting-title">TikTok Session ID (Opsional)</span>
+              <span class="setting-desc">Diperlukan jika stream Anda dibatasi usia 18+ atau follower-only. Hanya disimpan secara lokal di komputer Anda.</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <input type="password" id="setting-session-id" class="setting-input" placeholder="Masukkan cookie sessionid..." autocomplete="off">
+              <button class="btn-copy-action" id="btn-toggle-session-visibility" style="width: 60px;">Lihat</button>
+              <button class="btn-copy-action" id="btn-clear-session" style="color: var(--accent-rose);">Hapus</button>
+            </div>
+          </div>
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="setting-title">Otomatis Hubungkan saat Aplikasi Dibuka</span>
+              <span class="setting-desc">Langsung memulai pemantauan username terakhir saat Strechat diluncurkan.</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-auto-connect">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
         <!-- Category 1: Tampilan & Obrolan -->
         <div class="settings-section">
           <div class="section-title">
@@ -386,6 +421,183 @@
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
               Unduh JSON
             </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay Studio Modal (Design Your Own OBS Overlay) -->
+  <div class="modal-overlay" id="modal-overlay-studio">
+    <div class="modal-card studio-modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+          <h2>Studio Desain Overlay OBS</h2>
+        </div>
+        <button class="titlebar-btn" id="btn-close-studio" title="Tutup">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="modal-body studio-body-grid">
+        <!-- Controls Column -->
+        <div class="studio-controls-col">
+          <!-- Preset Themes -->
+          <div class="settings-section">
+            <span class="section-title">Tema Tampilan</span>
+            <div class="theme-preset-pills" id="studio-theme-presets">
+              <button class="pill-btn active" data-theme="classic">Classic Box</button>
+              <button class="pill-btn" data-theme="pill">Modern Pill</button>
+              <button class="pill-btn" data-theme="glass">Glassmorphism</button>
+              <button class="pill-btn" data-theme="neon">Neon Glow</button>
+              <button class="pill-btn" data-theme="borderless">Borderless</button>
+            </div>
+          </div>
+
+          <!-- Typography & Sizing -->
+          <div class="settings-section">
+            <span class="section-title">Tipografi & Ukuran</span>
+            <div class="setting-item">
+              <span class="setting-title">Jenis Font</span>
+              <select id="studio-font-select" class="setting-input" style="width: 140px; height: 30px;">
+                <option value="Poppins" selected>Poppins</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Inter">Inter</option>
+                <option value="Bangers">Bangers (Komik)</option>
+                <option value="Ubuntu">Ubuntu</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <span class="setting-title">Ukuran Teks (<span id="studio-size-val">13</span>px)</span>
+              <input type="range" id="studio-size-slider" min="11" max="18" value="13" style="width: 140px;">
+            </div>
+          </div>
+
+          <!-- Colors -->
+          <div class="settings-section">
+            <span class="section-title">Kustomisasi Warna</span>
+            <div class="setting-item">
+              <span class="setting-title">Warna Latar Bubble</span>
+              <input type="color" id="studio-color-bg" value="#0f111a" class="studio-color-picker">
+            </div>
+            <div class="setting-item">
+              <span class="setting-title">Warna Nama User</span>
+              <input type="color" id="studio-color-name" value="#38bdf8" class="studio-color-picker">
+            </div>
+            <div class="setting-item">
+              <span class="setting-title">Warna Pesan Chat</span>
+              <input type="color" id="studio-color-text" value="#f1f5f9" class="studio-color-picker">
+            </div>
+          </div>
+
+          <!-- Animation & Auto-Fade -->
+          <div class="settings-section">
+            <span class="section-title">Animasi & Durasi</span>
+            <div class="setting-item">
+              <span class="setting-title">Animasi Masuk</span>
+              <select id="studio-anim-select" class="setting-input" style="width: 130px; height: 30px;">
+                <option value="pop" selected>Pop In</option>
+                <option value="slide">Slide In</option>
+                <option value="fade">Fade In</option>
+                <option value="bounce">Bounce</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <span class="setting-title">Waktu Menghilang (<span id="studio-fade-val">12s</span>)</span>
+              <input type="range" id="studio-fade-slider" min="0" max="30" step="2" value="12" style="width: 130px;">
+            </div>
+          </div>
+
+          <!-- Display Toggles -->
+          <div class="settings-section">
+            <span class="section-title">Elemen Tampilan</span>
+            <div class="setting-item">
+              <span class="setting-title">Tampilkan Avatar</span>
+              <label class="switch">
+                <input type="checkbox" id="studio-toggle-avatar" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <span class="setting-title">Tampilkan Badge Moderator</span>
+              <label class="switch">
+                <input type="checkbox" id="studio-toggle-badges" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Output Links -->
+          <div class="settings-section">
+            <span class="section-title">Tautan OBS Browser Source</span>
+            <div class="remote-link-box">
+              <span id="studio-generated-url">http://localhost:3000/overlay</span>
+              <button class="btn-copy-action" id="btn-copy-custom-overlay">Salin URL</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview Sandbox Column -->
+        <div class="studio-preview-col">
+          <div class="preview-header">
+            <span>LIVE PREVIEW SIMULASI</span>
+            <button class="pill-btn" id="btn-studio-mock-msg" style="font-size: 10px; height: 24px;">+ Tes Chat Masuk</button>
+          </div>
+          <div class="preview-canvas" id="studio-preview-canvas">
+            <div class="preview-overlay-feed" id="studio-preview-feed">
+              <div class="overlay-item anim-pop" id="mock-item-1">
+                <div class="overlay-avatar-placeholder">B</div>
+                <div class="overlay-body">
+                  <div class="overlay-header">
+                    <span class="overlay-nickname">Budi Gaming</span>
+                    <span class="overlay-badge badge-mod">MOD</span>
+                  </div>
+                  <div class="overlay-text">Halo bang, semangat live streamingnya! 🎉</div>
+                </div>
+              </div>
+              <div class="overlay-item overlay-gift anim-pop" id="mock-item-2">
+                <div class="overlay-avatar-placeholder">Z</div>
+                <div class="overlay-body">
+                  <div class="overlay-header">
+                    <span class="overlay-nickname">Zahra Stream</span>
+                    <span class="overlay-badge" style="background: rgba(245, 158, 11, 0.3); color: #f59e0b; border: 1px solid #f59e0b;">GIFT</span>
+                  </div>
+                  <div class="overlay-text gift-label">Mengirim <strong>Rose</strong> (5 💎) <span class="combo-badge">x5</span> 🌹</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Streamer Profiles Modal -->
+  <div class="modal-overlay" id="modal-profiles">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <h2>Kelola Profil Streamer</h2>
+        </div>
+        <button class="titlebar-btn" id="btn-close-profiles" title="Tutup">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <span class="setting-desc">Pilih akun tersimpan untuk langsung terhubung tanpa mengetik ulang username:</span>
+        <div class="profiles-list" id="profiles-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <span class="setting-title">Simpan Akun Baru</span>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="new-profile-input" class="channel-input" placeholder="Username TikTok..." style="height: 36px;">
+            <button class="btn-primary" id="btn-add-profile" style="height: 36px; padding: 0 14px;">+ Simpan</button>
           </div>
         </div>
       </div>

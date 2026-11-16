@@ -1398,3 +1398,286 @@ input:checked + .slider:before {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ==========================================================================
+   11. In-App Overlay Studio & Streamer Profiles
+   ========================================================================== */
+.studio-modal-card {
+  max-width: 780px !important;
+  width: 95%;
+  max-height: 88vh;
+}
+
+.studio-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+  height: 100%;
+}
+
+@media (max-width: 720px) {
+  .studio-body-grid {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+}
+
+.studio-controls-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding-right: 6px;
+  max-height: 70vh;
+}
+
+.studio-preview-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.preview-canvas {
+  background: radial-gradient(circle, #151824 10%, #0a0b10 90%);
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  flex: 1;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-canvas::before {
+  content: 'OBS TRANSPARENT CANVAS';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.15);
+  letter-spacing: 1px;
+  pointer-events: none;
+}
+
+.preview-overlay-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  transition: all var(--transition-fast);
+}
+
+/* Scoped Overlay Item styling inside preview feed */
+.preview-overlay-feed .overlay-item {
+  background: var(--studio-bg, rgba(15, 17, 26, 0.85));
+  border: var(--studio-border, 1px solid rgba(255, 255, 255, 0.12));
+  border-radius: var(--studio-radius, 12px);
+  padding: 8px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--studio-text, #f1f5f9);
+  font-family: var(--studio-font, 'Poppins', sans-serif);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.preview-overlay-feed .overlay-avatar-placeholder {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #f43f5e);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.preview-overlay-feed .overlay-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-overlay-feed .overlay-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.preview-overlay-feed .overlay-nickname {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--studio-name, #38bdf8);
+}
+
+.preview-overlay-feed .overlay-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.preview-overlay-feed .badge-mod {
+  background: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.preview-overlay-feed .overlay-text {
+  font-size: var(--studio-size, 13px);
+  line-height: 1.4;
+  color: var(--studio-text, #f1f5f9);
+  word-break: break-word;
+}
+
+.preview-overlay-feed .overlay-item.overlay-gift {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.28), rgba(244, 63, 94, 0.28));
+  border: 1.5px solid rgba(245, 158, 11, 0.65);
+}
+
+.preview-overlay-feed .overlay-gift .overlay-nickname {
+  color: #fbbf24;
+}
+
+.preview-overlay-feed .overlay-gift .gift-label {
+  color: #fef08a;
+  font-weight: 600;
+}
+
+.preview-overlay-feed .combo-badge {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  margin-left: 4px;
+}
+
+/* Animations for preview */
+.preview-overlay-feed .anim-pop { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.preview-overlay-feed .anim-slide { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.preview-overlay-feed .anim-fade { animation: fadeIn 0.35s ease; }
+.preview-overlay-feed .anim-bounce { animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+/* Color pickers */
+.studio-color-picker {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px;
+  height: 28px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  background: transparent;
+  padding: 0;
+}
+
+.studio-color-picker::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.studio-color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+/* Streamer Profiles list */
+.profiles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
+}
+
+.profile-card:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--accent-primary);
+}
+
+.profile-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.profile-card-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.profile-card-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.profile-card-badge {
+  font-size: 10px;
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.profile-card-del {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: all var(--transition-fast);
+}
+
+.profile-card-del:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+

@@ -29,6 +29,20 @@
   - Bar **Sematkan Pesan (Pin Message)**.
   - **Filter Kata Kasar / Terlarang** otomatis dengan masking `***`.
   - Filter pill (*Semua*, *Hanya Gift*) dan pencarian pesan instan.
+- **🎨 In-App Overlay Studio / Desainer Overlay OBS**:
+  - **5 Pilihan Preset Desain**: *Classic Box*, *Modern Pill*, *Glassmorphism*, *Neon Glow*, dan *Borderless*.
+  - **Kustomisasi Tipografi & Ukuran**: Dukungan Google Fonts aman (Poppins, Montserrat, Roboto, Inter, Bangers, Ubuntu) serta slider ukuran teks.
+  - **Color Picker Fleksibel**: Pilih warna latar belakang bubble, warna nickname, dan warna pesan chat.
+  - **4 Pilihan Animasi Masuk**: *Pop In*, *Slide In*, *Fade In*, *Bounce*.
+  - **Timer Menghilang Otomatis (Auto-Fade)**: Atur durasi chat tetap di layar (misal 5s, 10s, 15s) sebelum memudar mulus.
+  - **Live Preview Simulator**: Uji tampilan langsung di dalam aplikasi sebelum dipasang ke OBS.
+  - **Tautan URL Independen**: URL otomatis dibuat berdasarkan konfigurasi Anda (misal: `/overlay?theme=neon&anim=slide`).
+- **👥 Manajemen Multi-Profil Streamer**:
+  - Simpan dan kelola banyak akun TikTok sekaligus.
+  - Beralih antar profil akun hanya dengan 1 klik tanpa perlu mengetik ulang username.
+- **🔐 Koneksi Sesi TikTok Aman & Auto-Connect**:
+  - Hubungkan otomatis (*Auto-Connect*) saat aplikasi pertama kali dibuka.
+  - Dukungan opsional `sessionid` tersimpan lokal untuk membuka live stream yang dibatasi usia (18+) atau khusus pengikut tanpa risiko kebocoran data (0% telemetry, tidak pernah dicatat ke endpoint publik).
 - **🎬 Integrasi Penuh OBS Studio**:
   - **Overlay Transparan Chat (`http://localhost:3000/overlay`)**: Latar belakang transparan dengan outline teks kontras tinggi untuk *Browser Source* di OBS.
   - **OBS Custom Browser Dock (`http://localhost:3000`)**: Tempelkan panel dasbor langsung ke dalam jendela OBS Studio Anda.

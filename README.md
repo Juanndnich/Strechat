@@ -29,6 +29,20 @@
   - One-click **Pin Message** bar.
   - Built-in **Bad Words Moderation Filter** with automatic `***` masking.
   - Filter pills (*All*, *Gifts Only*) and instant search.
+- **🎨 In-App Overlay Studio / OBS Custom Designer**:
+  - **5 Built-in Design Presets**: *Classic Box*, *Modern Pill*, *Glassmorphism*, *Neon Glow*, and *Borderless*.
+  - **Typography & Font Customization**: Safe Google Fonts loader (Poppins, Montserrat, Roboto, Inter, Bangers, Ubuntu) and text scale slider.
+  - **Full Color Customization**: Customize bubble background, username color, and message text color.
+  - **4 Entrance Animations**: *Pop In*, *Slide In*, *Fade In*, *Bounce*.
+  - **Configurable Auto-Fade Timer**: Set chat bubbles to smoothly vanish after a specified duration (e.g. 5s, 10s, 15s) or stay permanently.
+  - **Live Preview Simulator**: Real-time preview canvas with mock chat injector for instant testing.
+  - **Independent Custom URLs**: URL automatically encodes your query parameters (e.g., `/overlay?theme=neon&anim=slide`).
+- **👥 Multi-Profile Streamer Manager**:
+  - Save and organize multiple TikTok accounts.
+  - Switch between saved streamer accounts with 1 click without re-typing usernames.
+- **🔐 Secure TikTok Session & Auto-Connect**:
+  - Optional client-side `sessionid` support to access age-restricted (18+) or follower-only live streams safely without data leaks.
+  - Optional auto-connect on app launch.
 - **🎬 OBS Studio Integration**:
   - **Transparent Chat Overlay (`http://localhost:3000/overlay`)**: High-contrast, transparent background, auto-fading overlay for OBS Browser Source.
   - **OBS Custom Browser Dock (`http://localhost:3000`)**: Embed the complete interactive monitor dock directly into your OBS Studio window.

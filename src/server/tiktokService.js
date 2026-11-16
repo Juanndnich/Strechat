@@ -84,8 +84,15 @@ class TikTokLiveService extends EventEmitter {
 
       this.client = new TikTokLiveClient(this.uniqueId);
 
+      // Secure optional TikTok session cookies (e.g. for 18+ or private rooms)
+      const rawSession = this.options?.sessionId ? String(this.options.sessionId).trim() : '';
+      const sessionCookie = rawSession ? (rawSession.includes('=') ? rawSession : `sessionid=${rawSession}`) : undefined;
+      if (sessionCookie) {
+        this.client.cookies(sessionCookie);
+      }
+
       // Bind events
-      this._bindClientEvents(EventType, fetchRoomInfo);
+      this._bindClientEvents(EventType, fetchRoomInfo, sessionCookie);
 
       // Start connection
       this.client.connect().catch((err) => {
@@ -126,12 +133,15 @@ class TikTokLiveService extends EventEmitter {
       return `Pengguna @${this.uniqueId} tidak ditemukan di TikTok.`;
     }
     if (raw.toLowerCase().includes('age restricted')) {
-      return `Live stream @${this.uniqueId} dibatasi usia (18+).`;
+      return `Live stream @${this.uniqueId} dibatasi usia (18+). Masukkan sessionid di Pengaturan untuk mengakses.`;
+    }
+    if (raw.toLowerCase().includes('sessionrequired') || raw.toLowerCase().includes('session required')) {
+      return `Live stream @${this.uniqueId} memerlukan sessionid TikTok di Pengaturan.`;
     }
     return `Koneksi ke @${this.uniqueId} gagal: ${raw}`;
   }
 
-  _bindClientEvents(EventType, fetchRoomInfo) {
+  _bindClientEvents(EventType, fetchRoomInfo, sessionCookie) {
     if (!this.client) return;
 
     // Helper: Mark stream active whenever any packet or event arrives
@@ -164,7 +174,7 @@ class TikTokLiveService extends EventEmitter {
       // Seed initial room statistics (viewers & likes) immediately
       if (this.stats.roomId) {
         try {
-          const roomInfo = await fetchRoomInfo(this.stats.roomId, 6000);
+          const roomInfo = await fetchRoomInfo(this.stats.roomId, 6000, sessionCookie);
           if (roomInfo) {
             const initialViewers = Number(roomInfo.viewers || roomInfo.totalUser || 0);
             const initialLikes = Number(roomInfo.likes || 0);
@@ -196,7 +206,7 @@ class TikTokLiveService extends EventEmitter {
       this.syncTimer = setInterval(async () => {
         if (this.status !== 'CONNECTED' || !this.stats.roomId) return;
         try {
-          const info = await fetchRoomInfo(this.stats.roomId, 5000);
+          const info = await fetchRoomInfo(this.stats.roomId, 5000, sessionCookie);
           if (info) {
             let updated = false;
             const liveViewers = Number(info.viewers || info.totalUser || 0);
