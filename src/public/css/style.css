@@ -95,6 +95,14 @@ body {
   pointer-events: none;
 }
 
+.brand-logo-img {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+}
+
 .brand-dot {
   width: 7px;
   height: 7px;
