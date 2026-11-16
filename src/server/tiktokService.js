@@ -437,6 +437,39 @@ class TikTokLiveService extends EventEmitter {
     this.emit('disconnected', { message: 'Koneksi diputus oleh pengguna.' });
     this.emit('status', this.getStatus());
   }
+
+  /**
+   * Check if a streamer is currently live on TikTok (used by Auto-Detect OBS feature)
+   */
+  async checkLiveStatus(targetUsername) {
+    if (!targetUsername || typeof targetUsername !== 'string' || !targetUsername.trim()) {
+      return { isLive: false, error: 'Username tidak valid' };
+    }
+
+    const username = cleanUsername(targetUsername);
+    if (!username || username === 'anonymous') {
+      return { isLive: false, error: 'Username tidak valid' };
+    }
+
+    try {
+      const { checkOnline } = await import('piratetok-live-js');
+      const result = await checkOnline(username, 6000);
+      if (result && result.roomId && result.roomId !== '0') {
+        return {
+          isLive: true,
+          roomId: String(result.roomId),
+          anchorId: String(result.anchorId || '')
+        };
+      }
+      return { isLive: false };
+    } catch (err) {
+      const msg = String(err?.message || '');
+      if (msg.includes('not online') || err?.name === 'HostNotOnlineError') {
+        return { isLive: false };
+      }
+      return { isLive: false, error: msg };
+    }
+  }
 }
 
 module.exports = new TikTokLiveService();

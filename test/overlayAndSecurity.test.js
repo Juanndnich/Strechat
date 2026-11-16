@@ -107,4 +107,13 @@ describe('TikTok Service Privacy and Token Isolation', () => {
     assert.strictEqual(status.stats.sessionId, undefined);
     assert.strictEqual(JSON.stringify(status).includes('secret_tiktok_session_token_12345'), false);
   });
+
+  it('checkLiveStatus() should safely validate username and handle offline status without crashing', async () => {
+    const invalidResult = await tikTokService.checkLiveStatus('');
+    assert.strictEqual(invalidResult.isLive, false);
+    assert.strictEqual(invalidResult.error, 'Username tidak valid');
+
+    const offlineResult = await tikTokService.checkLiveStatus('streamer_tidak_ditemukan_xyz_999');
+    assert.strictEqual(offlineResult.isLive, false);
+  });
 });

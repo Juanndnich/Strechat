@@ -66,7 +66,7 @@
 
       <!-- Single Action Buttons Row (NO DUPLICATION) -->
       <div class="toolbar-right">
-        <button class="tool-btn" id="btn-profiles" title="Profil Streamer Tersimpan">
+        <button class="tool-btn" id="btn-profiles" title="Akun TikTok Streamer & Auto-Detect OBS">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </button>
         <button class="tool-btn" id="btn-overlay-studio" title="Studio Desain Overlay OBS">
@@ -631,30 +631,55 @@
     </div>
   </div>
 
-  <!-- Streamer Profiles Modal -->
+  <!-- Streamer Account & OBS Auto-Detect Modal -->
   <div class="modal-overlay" id="modal-profiles">
-    <div class="modal-card" style="max-width: 440px;">
+    <div class="modal-card" style="max-width: 460px;">
       <div class="modal-header">
         <div class="modal-header-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          <h2>Kelola Profil Streamer</h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-lime);"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <h2>Akun TikTok & Siaran OBS</h2>
         </div>
         <button class="titlebar-btn" id="btn-close-profiles" title="Tutup">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
         </button>
       </div>
 
-      <div class="modal-body">
-        <span class="setting-desc">Pilih akun tersimpan untuk langsung terhubung tanpa mengetik ulang username:</span>
-        <div class="profiles-list" id="profiles-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;">
-          <!-- Rendered dynamically -->
+      <div class="modal-body" style="gap: 14px;">
+        <!-- OBS Auto-Detect Switch Box -->
+        <div style="background: rgba(163, 230, 53, 0.06); border: 1px solid rgba(163, 230, 53, 0.25); border-radius: var(--radius-sm); padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-lime);"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <div>
+                <strong style="font-size: 12px; color: var(--text-primary); display: block;">Auto-Detect Live OBS Studio</strong>
+                <span style="font-size: 10px; color: var(--text-muted);">Mulai pantau chat otomatis saat OBS Studio mulai live</span>
+              </div>
+            </div>
+            <label class="switch-toggle" style="position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0;">
+              <input type="checkbox" id="setting-obs-autodetect" style="opacity: 0; width: 0; height: 0;">
+              <span class="switch-slider" style="position: absolute; cursor: pointer; inset: 0; background-color: var(--border-medium); border-radius: 20px; transition: 0.2s;"></span>
+            </label>
+          </div>
+          <div id="obs-autodetect-status" style="font-size: 10.5px; color: var(--accent-lime); display: flex; align-items: center; gap: 6px; padding-top: 4px; border-top: 1px solid rgba(163, 230, 53, 0.12);">
+            <span class="status-dot connected" style="width: 6px; height: 6px;"></span>
+            <span>Standby: Strechat otomatis menyambung saat tombol "Start Streaming" ditekan di OBS.</span>
+          </div>
         </div>
 
-        <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
-          <span class="setting-title">Simpan Akun Baru</span>
+        <!-- Saved Profiles List -->
+        <div>
+          <span class="setting-title" style="font-size: 11.5px; margin-bottom: 6px; display: block;">Akun Streamer Tersimpan</span>
+          <div class="profiles-list" id="profiles-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Add or Update Profile -->
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+          <span class="setting-title" style="font-size: 11.5px;">Login / Tambah Akun Baru</span>
           <div style="display: flex; gap: 8px;">
-            <input type="text" id="new-profile-input" class="channel-input" placeholder="Username TikTok..." style="height: 36px;">
-            <button class="btn-primary" id="btn-add-profile" style="height: 36px; padding: 0 14px;">+ Simpan</button>
+            <input type="text" id="new-profile-input" class="channel-input" placeholder="Username TikTok (@streamer)..." style="height: 32px; flex: 1; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); padding: 0 10px; background: var(--bg-surface);">
+            <button class="btn-primary" id="btn-add-profile" style="height: 32px; padding: 0 14px; font-size: 11px; font-weight: 700; background: var(--accent-gradient); color: #070908; border-radius: var(--radius-sm);">+ Simpan</button>
           </div>
         </div>
       </div>

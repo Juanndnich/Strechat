@@ -28,7 +28,10 @@
     isDemo: false,
     pingMs: 0,
     uptimeTimer: null,
-    isAlwaysOnTop: false
+    isAlwaysOnTop: false,
+    obsAutoDetect: true,
+    obsAutoDetectTimer: null,
+    isCheckingLive: false
   };
 
   // DOM Elements
@@ -78,13 +81,15 @@
     btnToggleSession: document.getElementById('btn-toggle-session-visibility'),
     btnClearSession: document.getElementById('btn-clear-session'),
     settingAutoConnect: document.getElementById('setting-auto-connect'),
-    // Streamer Profiles
+    // Streamer Profiles & OBS Auto-Detect
     btnProfiles: document.getElementById('btn-profiles'),
     modalProfiles: document.getElementById('modal-profiles'),
     btnCloseProfiles: document.getElementById('btn-close-profiles'),
     profilesList: document.getElementById('profiles-list'),
     newProfileInput: document.getElementById('new-profile-input'),
     btnAddProfile: document.getElementById('btn-add-profile'),
+    settingObsAutoDetect: document.getElementById('setting-obs-autodetect'),
+    obsAutoDetectStatus: document.getElementById('obs-autodetect-status'),
     // Overlay Studio
     btnOverlayStudio: document.getElementById('btn-overlay-studio'),
     modalOverlayStudio: document.getElementById('modal-overlay-studio'),
@@ -353,9 +358,16 @@
       el.btnConnect.classList.add('btn-danger');
       el.channelInput.disabled = true;
       if (el.chatEmpty) el.chatEmpty.style.display = 'none';
+      stopObsAutoDetect();
     } else {
-      el.statusDot.className = 'status-dot disconnected';
-      el.statusText.textContent = 'Terputus';
+      const targetUser = (el.channelInput?.value || loadSettings().lastUsername || '').trim().replace(/^@+/, '');
+      if (state.obsAutoDetect && targetUser) {
+        el.statusDot.className = 'status-dot standby';
+        el.statusText.textContent = `Standby OBS: @${targetUser}`;
+      } else {
+        el.statusDot.className = 'status-dot disconnected';
+        el.statusText.textContent = 'Terputus';
+      }
       el.statusUptime.textContent = '00:00';
       el.btnConnect.innerHTML = `
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
@@ -363,6 +375,9 @@
       `;
       el.btnConnect.classList.remove('btn-danger');
       el.channelInput.disabled = false;
+      if (state.obsAutoDetect) {
+        startObsAutoDetect();
+      }
     }
   }
 
@@ -480,9 +495,11 @@
       loadAnalyticsData();
     }
 
-    // Floating Banner Pooling: Update existing combo or show max 2 compact banners
+    // Floating Banner Pooling: Update existing combo or show max 2 compact badges in top-left
     const giftKey = `${data.uniqueId || data.nickname}_${gift.giftName}`;
-    const existing = el.giftBannerArea.querySelector(`[data-gift-key="${giftKey}"]`);
+    const existing = el.giftBannerArea ? el.giftBannerArea.querySelector(`[data-gift-key="${giftKey}"]`) : null;
+    const safeNick = escapeHtml(data.nickname || 'Pengguna');
+    const safeGiftName = escapeHtml(gift.giftName || 'Gift');
 
     if (existing) {
       const badge = existing.querySelector('.gift-combo-badge');
@@ -494,7 +511,7 @@
       }
       const desc = existing.querySelector('.gift-desc');
       if (desc) {
-        desc.innerHTML = `Mengirim <strong>${gift.giftName}</strong> (${diamonds} Diamond)`;
+        desc.innerHTML = `Mengirim <strong>${safeGiftName}</strong> (${diamonds} Diamond)`;
       }
       clearTimeout(existing._timer);
       existing._timer = setTimeout(() => {
@@ -502,9 +519,9 @@
         existing.style.opacity = '0';
         existing.style.transform = 'translateY(-6px)';
         setTimeout(() => existing.remove(), 250);
-      }, 2500);
-    } else {
-      // Keep at most 2 banners in view to never cover chat
+      }, 2800);
+    } else if (el.giftBannerArea) {
+      // Keep at most 2 compact banners in top-left corner
       while (el.giftBannerArea.children.length >= 2) {
         el.giftBannerArea.removeChild(el.giftBannerArea.firstElementChild);
       }
@@ -514,12 +531,12 @@
       banner.dataset.giftKey = giftKey;
 
       let avatarSrc = data.profilePictureUrl && data.profilePictureUrl.startsWith('http')
-        ? `<img class="gift-avatar" src="${data.profilePictureUrl}" alt="${data.nickname}">`
-        : `<div class="gift-avatar-placeholder">${data.nickname.charAt(0).toUpperCase()}</div>`;
+        ? `<img class="gift-avatar" src="${escapeHtml(data.profilePictureUrl)}" alt="${safeNick}">`
+        : `<div class="gift-avatar-placeholder">${safeNick.charAt(0).toUpperCase()}</div>`;
 
       let giftImg = gift.giftPictureUrl
-        ? `<img class="gift-icon-img" src="${gift.giftPictureUrl}" alt="${gift.giftName}">`
-        : `<svg class="gift-icon-img" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>`;
+        ? `<img class="gift-icon-img" src="${escapeHtml(gift.giftPictureUrl)}" alt="${safeGiftName}">`
+        : `<svg class="gift-icon-img" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>`;
 
       const comboHtml = data.repeatCount > 1
         ? `<span class="gift-combo-badge">x${data.repeatCount}</span>`
@@ -529,8 +546,8 @@
         <div class="gift-banner-left">
           ${avatarSrc}
           <div class="gift-info">
-            <span class="gift-sender">${data.nickname}</span>
-            <span class="gift-desc">Mengirim <strong>${gift.giftName}</strong> (${diamonds} Diamond)</span>
+            <span class="gift-sender">${safeNick}</span>
+            <span class="gift-desc">Mengirim <strong>${safeGiftName}</strong> (${diamonds} Diamond)</span>
           </div>
         </div>
         <div class="gift-banner-right">
@@ -546,7 +563,7 @@
         banner.style.opacity = '0';
         banner.style.transform = 'translateY(-6px)';
         setTimeout(() => banner.remove(), 250);
-      }, 2500);
+      }, 2800);
     }
   }
 
@@ -562,15 +579,18 @@
     item.dataset.isQuestion = 'false';
     item.dataset.isMod = 'false';
 
+    const safeNick = escapeHtml(data.nickname || 'Pengguna');
+    const safeGiftName = escapeHtml(data.gift?.giftName || 'Gift');
+
     let avatarHtml = '';
     if (data.profilePictureUrl && data.profilePictureUrl.startsWith('http')) {
-      avatarHtml = `<img class="chat-avatar" src="${data.profilePictureUrl}" alt="${data.nickname}">`;
+      avatarHtml = `<img class="chat-avatar" src="${escapeHtml(data.profilePictureUrl)}" alt="${safeNick}">`;
     } else {
-      avatarHtml = `<div class="chat-avatar-placeholder">${data.nickname.charAt(0).toUpperCase()}</div>`;
+      avatarHtml = `<div class="chat-avatar-placeholder">${safeNick.charAt(0).toUpperCase()}</div>`;
     }
 
-    let giftImg = data.gift.giftPictureUrl
-      ? `<img src="${data.gift.giftPictureUrl}" style="width: 20px; height: 20px; vertical-align: middle; margin-left: 4px;" alt="">`
+    let giftImg = data.gift?.giftPictureUrl
+      ? `<img src="${escapeHtml(data.gift.giftPictureUrl)}" style="width: 20px; height: 20px; vertical-align: middle; margin-left: 4px; object-fit: contain;" alt="">`
       : '';
 
     const timeString = new Date(data.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -579,12 +599,12 @@
       ${avatarHtml}
       <div class="chat-body">
         <div class="chat-header">
-          <span class="chat-nickname">${data.nickname}</span>
+          <span class="chat-nickname">${safeNick}</span>
           <span class="badge-item badge-gift">GIFT</span>
           <span class="chat-time">${timeString}</span>
         </div>
         <div class="chat-text gift-highlight">
-          Mengirim <strong>${data.gift.giftName}</strong> (${diamonds} Diamond) ${data.repeatCount > 1 ? 'x' + data.repeatCount : ''} ${giftImg}
+          Mengirim <strong>${safeGiftName}</strong> (${diamonds} Diamond) ${data.repeatCount > 1 ? 'x' + data.repeatCount : ''} ${giftImg}
         </div>
       </div>
     `;
@@ -789,6 +809,89 @@
     } catch (e) {}
   }
 
+  // Connect directly to a TikTok streamer room
+  function connectToTikTok(targetUsername) {
+    const username = (targetUsername || el.channelInput.value || '').trim().replace(/^@+/, '');
+    if (!username) return;
+    el.channelInput.value = username;
+    const settings = loadSettings();
+    const sessionId = settings.sessionId || '';
+    sendWsAction('connect', { username, sessionId });
+    saveSettings({ lastUsername: username });
+    addProfile(username);
+    el.statusDot.className = 'status-dot connecting';
+    el.statusText.textContent = 'Menghubungkan...';
+  }
+
+  // Auto-Detect OBS Studio Live Session
+  function startObsAutoDetect() {
+    stopObsAutoDetect();
+    if (!state.obsAutoDetect) return;
+
+    const check = async () => {
+      if (state.connected || state.status === 'CONNECTED' || state.status === 'CONNECTING' || state.isCheckingLive) {
+        return;
+      }
+
+      const username = (el.channelInput?.value || loadSettings().lastUsername || '').trim().replace(/^@+/, '');
+      if (!username) {
+        updateAutoDetectStatusUI(false, 'Masukkan username target untuk auto-detect OBS');
+        return;
+      }
+
+      updateAutoDetectStatusUI(true, `Standby: Menunggu siaran @${username} dimulai di OBS Studio...`);
+
+      if (!state.connected && state.status !== 'CONNECTING') {
+        el.statusDot.className = 'status-dot standby';
+        el.statusText.textContent = `Standby OBS: @${username}`;
+      }
+
+      state.isCheckingLive = true;
+      try {
+        const res = await fetch(`/api/check-live?username=${encodeURIComponent(username)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.isLive && !state.connected && state.status !== 'CONNECTING') {
+            console.log(`[strechat] Siaran OBS untuk @${username} terdeteksi LIVE! Menghubungkan...`);
+            showNotification(`🟢 Siaran OBS Terdeteksi! Menghubungkan ke @${username}...`, 'success');
+            connectToTikTok(username);
+          }
+        }
+      } catch (err) {
+        // Silently retry on next tick
+      } finally {
+        state.isCheckingLive = false;
+      }
+    };
+
+    state.obsAutoDetectTimer = setInterval(check, 6000);
+    setTimeout(check, 1200);
+  }
+
+  function stopObsAutoDetect() {
+    if (state.obsAutoDetectTimer) {
+      clearInterval(state.obsAutoDetectTimer);
+      state.obsAutoDetectTimer = null;
+    }
+  }
+
+  function updateAutoDetectStatusUI(active, text) {
+    if (!el.obsAutoDetectStatus) return;
+    if (active) {
+      el.obsAutoDetectStatus.innerHTML = `
+        <span class="status-dot connected" style="width: 6px; height: 6px;"></span>
+        <span>${escapeHtml(text)}</span>
+      `;
+      el.obsAutoDetectStatus.style.color = 'var(--accent-lime)';
+    } else {
+      el.obsAutoDetectStatus.innerHTML = `
+        <span class="status-dot disconnected" style="width: 6px; height: 6px;"></span>
+        <span>${escapeHtml(text)}</span>
+      `;
+      el.obsAutoDetectStatus.style.color = 'var(--text-muted)';
+    }
+  }
+
   // Event Listeners
   function setupEventListeners() {
     // Connect / Disconnect Button
@@ -809,13 +912,7 @@
           el.channelInput.focus();
           return;
         }
-        const settings = loadSettings();
-        const sessionId = settings.sessionId || '';
-        sendWsAction('connect', { username, sessionId });
-        saveSettings({ lastUsername: username });
-        addProfile(username);
-        el.statusDot.className = 'status-dot connecting';
-        el.statusText.textContent = 'Menghubungkan...';
+        connectToTikTok(username);
       }
     });
 
@@ -1167,13 +1264,50 @@
           return;
         }
         addProfile(val);
+        el.channelInput.value = val;
+        saveSettings({ lastUsername: val });
         el.newProfileInput.value = '';
-        showNotification(`Profil @${val} berhasil disimpan`, 'info');
+        renderProfiles();
+        if (state.obsAutoDetect) {
+          startObsAutoDetect();
+        }
+        showNotification(`Profil @${val} disimpan & aktif untuk OBS`, 'success');
       };
 
       el.btnAddProfile.addEventListener('click', handleAddProfile);
       el.newProfileInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') handleAddProfile();
+      });
+    }
+
+    if (el.settingObsAutoDetect) {
+      el.settingObsAutoDetect.addEventListener('change', (e) => {
+        state.obsAutoDetect = e.target.checked;
+        saveSettings({ obsAutoDetect: state.obsAutoDetect });
+        if (state.obsAutoDetect) {
+          startObsAutoDetect();
+          showNotification('Auto-Detect Siaran OBS diaktifkan', 'success');
+        } else {
+          stopObsAutoDetect();
+          updateAutoDetectStatusUI(false, 'Auto-detect nonaktif (mode koneksi manual)');
+          if (!state.connected && state.status === 'DISCONNECTED') {
+            el.statusDot.className = 'status-dot disconnected';
+            el.statusText.textContent = 'Terputus';
+          }
+          showNotification('Auto-Detect Siaran OBS dinonaktifkan', 'info');
+        }
+      });
+    }
+
+    if (el.channelInput) {
+      el.channelInput.addEventListener('input', () => {
+        const val = el.channelInput.value.trim().replace(/^@+/, '');
+        if (val) {
+          saveSettings({ lastUsername: val });
+          if (state.obsAutoDetect) {
+            startObsAutoDetect();
+          }
+        }
       });
     }
 
@@ -1347,10 +1481,12 @@
     const profiles = loadProfiles();
     el.profilesList.innerHTML = '';
 
+    const currentTarget = (el.channelInput?.value || loadSettings().lastUsername || '').trim().replace(/^@+/, '');
+
     if (profiles.length === 0) {
       el.profilesList.innerHTML = `
-        <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;">
-          Belum ada profil tersimpan. Masukkan username di bawah untuk menyimpan profil pertama Anda.
+        <div style="padding: 12px; text-align: center; color: var(--text-muted); font-size: 11px;">
+          Belum ada akun tersimpan. Masukkan username di bawah untuk menyimpan akun streamer Anda.
         </div>
       `;
       return;
@@ -1358,12 +1494,18 @@
 
     profiles.forEach((username) => {
       const card = document.createElement('div');
-      card.className = 'profile-card';
+      const isCurrent = (username.toLowerCase() === currentTarget.toLowerCase());
+      card.className = `profile-card ${isCurrent ? 'active-profile' : ''}`;
       const initial = (username[0] || 'T').toUpperCase();
       card.innerHTML = `
-        <div class="profile-card-left" title="Gunakan akun @${escapeHtml(username)}">
+        <div class="profile-card-left" title="Pilih @${escapeHtml(username)} sebagai target siaran OBS">
           <div class="profile-card-avatar">${initial}</div>
-          <span class="profile-card-name">@${escapeHtml(username)}</span>
+          <div style="display:flex; flex-direction:column; min-width:0;">
+            <span class="profile-card-name">@${escapeHtml(username)}</span>
+            <span style="font-size: 9.5px; color: ${isCurrent ? 'var(--accent-lime)' : 'var(--text-muted)'}; font-weight: ${isCurrent ? '700' : '500'};">
+              ${isCurrent ? '● Target Aktif OBS' : 'Klik untuk jadikan target OBS'}
+            </span>
+          </div>
         </div>
         <button class="profile-card-del" title="Hapus profil" data-user="${escapeHtml(username)}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -1373,8 +1515,11 @@
       card.querySelector('.profile-card-left').addEventListener('click', () => {
         el.channelInput.value = username;
         saveSettings({ lastUsername: username });
-        if (el.modalProfiles) el.modalProfiles.classList.remove('open');
-        showNotification(`Profil @${username} dipilih`, 'info');
+        renderProfiles();
+        if (state.obsAutoDetect) {
+          startObsAutoDetect();
+        }
+        showNotification(`Target OBS aktif: @${username}`, 'success');
       });
 
       card.querySelector('.profile-card-del').addEventListener('click', (e) => {
@@ -1532,6 +1677,7 @@
     bannedWords: '',
     sessionId: '',
     autoConnect: false,
+    obsAutoDetect: true,
     lastUsername: ''
   };
 
@@ -1578,6 +1724,7 @@
         bannedWords: typeof parsed?.bannedWords === 'string' ? parsed.bannedWords : DEFAULT_SETTINGS.bannedWords,
         sessionId: typeof parsed?.sessionId === 'string' ? parsed.sessionId : DEFAULT_SETTINGS.sessionId,
         autoConnect: typeof parsed?.autoConnect === 'boolean' ? parsed.autoConnect : DEFAULT_SETTINGS.autoConnect,
+        obsAutoDetect: typeof parsed?.obsAutoDetect === 'boolean' ? parsed.obsAutoDetect : DEFAULT_SETTINGS.obsAutoDetect,
         lastUsername: typeof parsed?.lastUsername === 'string' ? parsed.lastUsername : DEFAULT_SETTINGS.lastUsername
       };
     } catch (e) {
@@ -1631,12 +1778,22 @@
       el.channelInput.value = settings.lastUsername;
     }
 
+    // Restore OBS Auto-Detect setting
+    state.obsAutoDetect = settings.obsAutoDetect !== false;
+    if (el.settingObsAutoDetect) {
+      el.settingObsAutoDetect.checked = state.obsAutoDetect;
+    }
+
     setupEventListeners();
     initWebSocket();
     loadServerInfo();
     renderProfiles();
     updateStudioUrl();
     loadAnalyticsData();
+
+    if (state.obsAutoDetect) {
+      startObsAutoDetect();
+    }
   }
 
   document.addEventListener('DOMContentLoaded', init);

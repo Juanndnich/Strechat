@@ -104,6 +104,20 @@ app.post('/api/disconnect', async (req, res) => {
   }
 });
 
+// Auto-Detect OBS Live status endpoint
+app.get('/api/check-live', async (req, res) => {
+  const username = req.query.username;
+  if (!username) {
+    return res.status(400).json({ success: false, error: 'Parameter username diperlukan.' });
+  }
+  try {
+    const result = await tikTokService.checkLiveStatus(username);
+    res.json({ success: true, ...result });
+  } catch (err) {
+    res.status(500).json({ success: false, isLive: false, error: err.message });
+  }
+});
+
 // Dedicated route for OBS Browser Source Overlay
 app.get('/overlay', (req, res) => {
   res.sendFile(path.join(publicPath, 'overlay.html'));
