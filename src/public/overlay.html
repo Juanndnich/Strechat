@@ -164,14 +164,166 @@
     }
 
     .combo-badge {
-      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      background: linear-gradient(135deg, #00f0ff, #a855f7);
       color: #fff;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
       padding: 1px 7px;
       border-radius: 9999px;
       margin-left: 6px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ==========================================================================
+       Pixel Overlay Theme (Custom Streamer Designs: Cat Chat & Crown Gift)
+       ========================================================================== */
+    .pixel-overlay-banner {
+      position: relative;
+      width: 100%;
+      max-width: 460px;
+      margin: 0 auto;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .pixel-banner-bg {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Comment Banner Content */
+    .pixel-comment-content {
+      position: absolute;
+      left: 31%;
+      top: 36%;
+      width: 52%;
+      height: 56%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0 4px;
+    }
+
+    .pixel-comment-author {
+      font-family: var(--overlay-font);
+      font-weight: 700;
+      font-size: 13px;
+      color: #2b1747;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pixel-comment-msg {
+      font-family: var(--overlay-font);
+      font-weight: 600;
+      font-size: 11.5px;
+      color: #432168;
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: break-word;
+    }
+
+    /* Gift Banner Content */
+    .pixel-gift-avatar-wrap {
+      position: absolute;
+      left: 6.8%;
+      top: 25.5%;
+      width: 21%;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.25);
+    }
+
+    .pixel-gift-avatar-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .pixel-gift-avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #00f0ff, #a855f7);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      border-radius: 50%;
+    }
+
+    .pixel-gift-content {
+      position: absolute;
+      left: 30.5%;
+      top: 38%;
+      width: 48%;
+      height: 52%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0 4px;
+    }
+
+    .pixel-gift-author {
+      font-family: var(--overlay-font);
+      font-weight: 700;
+      font-size: 13px;
+      color: #2b1747;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+
+    .pixel-gift-info {
+      font-family: var(--overlay-font);
+      font-weight: 600;
+      font-size: 11px;
+      color: #4a2174;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pixel-diamond-tag {
+      background: #fdf2f8;
+      color: #db2777;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      border: 1px solid #f472b6;
+      font-size: 10px;
     }
 
     @keyframes popIn {
@@ -211,7 +363,7 @@
       const params = new URLSearchParams(window.location.search);
 
       // Parse configuration from URL query params
-      const theme = params.get('theme') || 'classic';
+      const theme = params.get('theme') || 'pixel';
       const font = params.get('font');
       const bg = params.get('bg');
       const textColor = params.get('textColor');
@@ -227,11 +379,17 @@
       const root = document.documentElement;
       function applyTheme(t) {
         switch (t) {
+          case 'pixel':
+            root.style.setProperty('--overlay-bg', 'transparent');
+            root.style.setProperty('--overlay-border', 'none');
+            root.style.setProperty('--overlay-shadow', 'none');
+            root.style.setProperty('--overlay-backdrop', 'none');
+            break;
           case 'pill':
             root.style.setProperty('--overlay-bg', 'rgba(18, 22, 34, 0.92)');
-            root.style.setProperty('--overlay-border', '1px solid rgba(99, 102, 241, 0.35)');
+            root.style.setProperty('--overlay-border', '1px solid rgba(0, 240, 255, 0.35)');
             root.style.setProperty('--overlay-border-radius', '9999px');
-            root.style.setProperty('--overlay-name-color', '#818cf8');
+            root.style.setProperty('--overlay-name-color', '#38bdf8');
             root.style.setProperty('--overlay-shadow', '0 4px 14px rgba(0, 0, 0, 0.35)');
             root.style.setProperty('--overlay-backdrop', 'blur(6px)');
             break;
@@ -239,23 +397,23 @@
             root.style.setProperty('--overlay-bg', 'rgba(255, 255, 255, 0.1)');
             root.style.setProperty('--overlay-border', '1px solid rgba(255, 255, 255, 0.25)');
             root.style.setProperty('--overlay-border-radius', '14px');
-            root.style.setProperty('--overlay-name-color', '#67e8f9');
+            root.style.setProperty('--overlay-name-color', '#00f0ff');
             root.style.setProperty('--overlay-shadow', '0 8px 32px rgba(0, 0, 0, 0.35)');
             root.style.setProperty('--overlay-backdrop', 'blur(16px)');
             break;
           case 'neon':
             root.style.setProperty('--overlay-bg', 'rgba(10, 10, 18, 0.94)');
-            root.style.setProperty('--overlay-border', '1.5px solid #6366f1');
+            root.style.setProperty('--overlay-border', '1.5px solid #00f0ff');
             root.style.setProperty('--overlay-border-radius', '10px');
-            root.style.setProperty('--overlay-name-color', '#a78bfa');
-            root.style.setProperty('--overlay-shadow', '0 0 16px rgba(99, 102, 241, 0.55), inset 0 0 10px rgba(99, 102, 241, 0.15)');
+            root.style.setProperty('--overlay-name-color', '#a855f7');
+            root.style.setProperty('--overlay-shadow', '0 0 16px rgba(0, 240, 255, 0.55), inset 0 0 10px rgba(0, 240, 255, 0.15)');
             root.style.setProperty('--overlay-backdrop', 'none');
             break;
           case 'borderless':
             root.style.setProperty('--overlay-bg', 'transparent');
             root.style.setProperty('--overlay-border', 'none');
             root.style.setProperty('--overlay-border-radius', '0');
-            root.style.setProperty('--overlay-name-color', '#38bdf8');
+            root.style.setProperty('--overlay-name-color', '#00f0ff');
             root.style.setProperty('--overlay-shadow', 'none');
             root.style.setProperty('--overlay-backdrop', 'none');
             root.style.setProperty('--overlay-text-shadow', '0 2px 4px rgba(0, 0, 0, 0.95), 0 0 3px #000');
@@ -265,7 +423,7 @@
             root.style.setProperty('--overlay-bg', 'rgba(15, 17, 26, 0.85)');
             root.style.setProperty('--overlay-border', '1px solid rgba(255, 255, 255, 0.12)');
             root.style.setProperty('--overlay-border-radius', '12px');
-            root.style.setProperty('--overlay-name-color', '#38bdf8');
+            root.style.setProperty('--overlay-name-color', '#00f0ff');
             root.style.setProperty('--overlay-shadow', '0 4px 15px rgba(0, 0, 0, 0.4)');
             root.style.setProperty('--overlay-backdrop', 'blur(8px)');
             break;
@@ -295,6 +453,17 @@
       // Animation class
       const animClass = `anim-${['pop', 'slide', 'fade', 'bounce'].includes(animType) ? animType : 'pop'}`;
 
+      // Helper for HTML escape
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
       // WebSocket Connection
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${protocol}//${window.location.host}/ws`;
@@ -317,13 +486,91 @@
       }
 
       function renderChat(chat) {
+        if (theme === 'pixel') {
+          renderPixelChat(chat);
+        } else {
+          renderStandardChat(chat);
+        }
+      }
+
+      function renderGift(data) {
+        if (theme === 'pixel') {
+          renderPixelGift(data);
+        } else {
+          renderStandardGift(data);
+        }
+      }
+
+      function renderPixelChat(chat) {
+        const item = document.createElement('div');
+        item.className = `pixel-overlay-banner pixel-comment-banner ${animClass}`;
+        const modBadge = (!hideBadges && chat.isModerator)
+          ? `<span class="overlay-badge badge-mod" style="font-size: 8px; padding: 0 4px; border-radius: 2px;">MOD</span>`
+          : '';
+
+        item.innerHTML = `
+          <img class="pixel-banner-bg" src="images/overlay-comment.png" alt="" />
+          <div class="pixel-comment-content">
+            <div class="pixel-comment-author">
+              <span>${escapeHtml(chat.nickname)}</span>
+              ${modBadge}
+            </div>
+            <div class="pixel-comment-msg">${escapeHtml(chat.comment)}</div>
+          </div>
+        `;
+        addItem(item);
+      }
+
+      function renderPixelGift(data) {
+        const item = document.createElement('div');
+        item.className = `pixel-overlay-banner pixel-gift-banner ${animClass}`;
+
+        let avatarHtml = '';
+        if (!hideAvatar) {
+          avatarHtml = data.profilePictureUrl && data.profilePictureUrl.startsWith('http')
+            ? `<img src="${escapeHtml(data.profilePictureUrl)}" alt="">`
+            : `<div class="pixel-gift-avatar-placeholder">${(data.nickname || 'G').charAt(0).toUpperCase()}</div>`;
+        }
+
+        const combo = data.repeatCount > 1
+          ? `<span class="combo-badge">x${data.repeatCount}</span>`
+          : '';
+
+        const diamonds = data.diamonds !== undefined
+          ? data.diamonds
+          : ((data.gift?.diamondCount || 0) * (data.repeatCount || 1));
+
+        const giftName = data.gift?.giftName || 'Gift';
+        const giftImg = data.gift?.giftPictureUrl
+          ? `<img src="${escapeHtml(data.gift.giftPictureUrl)}" style="width: 16px; height: 16px; object-fit: contain; vertical-align: middle;" alt="">`
+          : '🎁';
+
+        item.innerHTML = `
+          <img class="pixel-banner-bg" src="images/overlay-gift.png" alt="" />
+          ${avatarHtml ? `<div class="pixel-gift-avatar-wrap">${avatarHtml}</div>` : ''}
+          <div class="pixel-gift-content">
+            <div class="pixel-gift-author">
+              <span>${escapeHtml(data.nickname)}</span>
+              ${combo}
+            </div>
+            <div class="pixel-gift-info">
+              <span>Mengirim <strong>${escapeHtml(giftName)}</strong></span>
+              ${giftImg}
+              <span class="pixel-diamond-tag">${diamonds} 💎</span>
+            </div>
+          </div>
+        `;
+        addItem(item);
+      }
+
+      function renderStandardChat(chat) {
         const item = document.createElement('div');
         item.className = `overlay-item ${animClass}`;
 
         let avatarHtml = '';
         if (!hideAvatar) {
           avatarHtml = chat.profilePictureUrl && chat.profilePictureUrl.startsWith('http')
-            ? `<img class="overlay-avatar" src="${chat.profilePictureUrl}" alt="">`
+            ? `<img class="overlay-avatar" src="${escapeHtml(chat.profilePictureUrl)}" alt="">`
             : `<div class="overlay-avatar-placeholder">${(chat.nickname || 'U').charAt(0).toUpperCase()}</div>`;
         }
 
@@ -335,24 +582,24 @@
           ${avatarHtml}
           <div class="overlay-body">
             <div class="overlay-header">
-              <span class="overlay-nickname">${chat.nickname}</span>
+              <span class="overlay-nickname">${escapeHtml(chat.nickname)}</span>
               ${badgeHtml}
             </div>
-            <div class="overlay-text">${chat.comment}</div>
+            <div class="overlay-text">${escapeHtml(chat.comment)}</div>
           </div>
         `;
 
         addItem(item);
       }
 
-      function renderGift(data) {
+      function renderStandardGift(data) {
         const item = document.createElement('div');
         item.className = `overlay-item overlay-gift ${animClass}`;
 
         let avatarHtml = '';
         if (!hideAvatar) {
           avatarHtml = data.profilePictureUrl && data.profilePictureUrl.startsWith('http')
-            ? `<img class="overlay-avatar" src="${data.profilePictureUrl}" alt="">`
+            ? `<img class="overlay-avatar" src="${escapeHtml(data.profilePictureUrl)}" alt="">`
             : `<div class="overlay-avatar-placeholder">${(data.nickname || 'G').charAt(0).toUpperCase()}</div>`;
         }
 
@@ -365,18 +612,18 @@
           : ((data.gift?.diamondCount || 0) * (data.repeatCount || 1));
 
         let giftImg = data.gift?.giftPictureUrl
-          ? `<img src="${data.gift.giftPictureUrl}" style="width: 22px; height: 22px; vertical-align: middle; margin-left: 4px;" alt="">`
+          ? `<img src="${escapeHtml(data.gift.giftPictureUrl)}" style="width: 22px; height: 22px; vertical-align: middle; margin-left: 4px;" alt="">`
           : '🎁';
 
         item.innerHTML = `
           ${avatarHtml}
           <div class="overlay-body">
             <div class="overlay-header">
-              <span class="overlay-nickname">${data.nickname}</span>
+              <span class="overlay-nickname">${escapeHtml(data.nickname)}</span>
               <span class="overlay-badge" style="background: rgba(245, 158, 11, 0.3); color: #f59e0b; border: 1px solid #f59e0b;">GIFT</span>
             </div>
             <div class="overlay-text gift-label">
-              Mengirim <strong>${data.gift?.giftName || 'Gift'}</strong> (${diamonds} 💎) ${combo} ${giftImg}
+              Mengirim <strong>${escapeHtml(data.gift?.giftName || 'Gift')}</strong> (${diamonds} 💎) ${combo} ${giftImg}
             </div>
           </div>
         `;

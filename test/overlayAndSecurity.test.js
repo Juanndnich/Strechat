@@ -5,10 +5,10 @@ const tikTokService = require('../src/server/tiktokService');
 describe('Overlay Studio Configuration & Sanitization', () => {
   const SAFE_FONTS = ['Poppins', 'Montserrat', 'Roboto', 'Inter', 'Bangers', 'Ubuntu'];
   const VALID_ANIMATIONS = ['pop', 'slide', 'fade', 'bounce'];
-  const THEME_NAMES = ['classic', 'pill', 'glass', 'neon', 'borderless'];
+  const THEME_NAMES = ['pixel', 'classic', 'pill', 'glass', 'neon', 'borderless'];
 
   function parseOverlayParams(paramsObj) {
-    const theme = THEME_NAMES.includes(paramsObj.theme) ? paramsObj.theme : 'classic';
+    const theme = THEME_NAMES.includes(paramsObj.theme) ? paramsObj.theme : 'pixel';
     const font = SAFE_FONTS.includes(paramsObj.font) ? paramsObj.font : 'Poppins';
     const anim = VALID_ANIMATIONS.includes(paramsObj.anim) ? paramsObj.anim : 'pop';
     const rawSize = parseInt(paramsObj.size, 10);
@@ -23,7 +23,7 @@ describe('Overlay Studio Configuration & Sanitization', () => {
 
   it('should parse valid overlay query parameters correctly', () => {
     const config = parseOverlayParams({
-      theme: 'neon',
+      theme: 'pixel',
       font: 'Montserrat',
       anim: 'slide',
       size: '15',
@@ -32,7 +32,7 @@ describe('Overlay Studio Configuration & Sanitization', () => {
       hideBadges: 'false'
     });
 
-    assert.strictEqual(config.theme, 'neon');
+    assert.strictEqual(config.theme, 'pixel');
     assert.strictEqual(config.font, 'Montserrat');
     assert.strictEqual(config.anim, 'slide');
     assert.strictEqual(config.size, 15);
@@ -52,7 +52,7 @@ describe('Overlay Studio Configuration & Sanitization', () => {
       hideBadges: null
     });
 
-    assert.strictEqual(config.theme, 'classic');
+    assert.strictEqual(config.theme, 'pixel');
     assert.strictEqual(config.font, 'Poppins');
     assert.strictEqual(config.anim, 'pop');
     assert.strictEqual(config.size, 24); // clamped to max 24

@@ -1315,6 +1315,9 @@
     if (el.btnOverlayStudio && el.modalOverlayStudio) {
       el.btnOverlayStudio.addEventListener('click', () => {
         updateStudioPreview();
+        if (el.studioPreviewFeed && el.studioPreviewFeed.children.length === 0) {
+          spawnStudioMockMessage();
+        }
         el.modalOverlayStudio.classList.add('open');
       });
     }
@@ -1341,7 +1344,7 @@
           btn.classList.add('active');
           const t = btn.dataset.theme;
           studioState.theme = t;
-          const def = THEME_DEFAULTS[t] || THEME_DEFAULTS.classic;
+          const def = THEME_DEFAULTS[t] || THEME_DEFAULTS.pixel;
           studioState.bg = def.bg;
           studioState.nameColor = def.nameColor;
           studioState.textColor = def.textColor;
@@ -1352,7 +1355,11 @@
           if (el.studioColorName) el.studioColorName.value = def.nameColor;
           if (el.studioColorText) el.studioColorText.value = def.textColor;
 
+          if (el.studioPreviewFeed) {
+            el.studioPreviewFeed.innerHTML = '';
+          }
           updateStudioPreview();
+          spawnStudioMockMessage();
         });
       });
     }
@@ -1555,12 +1562,12 @@
   // In-App Overlay Studio Designer
   // ==========================================================================
   const studioState = {
-    theme: 'classic',
+    theme: 'pixel',
     font: 'Poppins',
     size: 13,
-    bg: '#0f111a',
-    nameColor: '#38bdf8',
-    textColor: '#f1f5f9',
+    bg: 'transparent',
+    nameColor: '#2b1747',
+    textColor: '#432168',
     anim: 'pop',
     fade: 12,
     hideAvatar: false,
@@ -1568,16 +1575,17 @@
   };
 
   const THEME_DEFAULTS = {
-    classic: { bg: '#0f111a', nameColor: '#38bdf8', textColor: '#f1f5f9', radius: '12px', border: '1px solid rgba(255, 255, 255, 0.12)' },
-    pill: { bg: 'rgba(20, 24, 39, 0.9)', nameColor: '#60a5fa', textColor: '#f8fafc', radius: '9999px', border: '1px solid rgba(255, 255, 255, 0.15)' },
-    glass: { bg: 'rgba(255, 255, 255, 0.08)', nameColor: '#a5f3fc', textColor: '#ffffff', radius: '14px', border: '1px solid rgba(255, 255, 255, 0.22)' },
-    neon: { bg: 'rgba(10, 10, 18, 0.95)', nameColor: '#00f0ff', textColor: '#f0abfc', radius: '10px', border: '1px solid #00f0ff' },
-    borderless: { bg: 'transparent', nameColor: '#facc15', textColor: '#ffffff', radius: '0px', border: 'none' }
+    pixel: { bg: 'transparent', nameColor: '#2b1747', textColor: '#432168', radius: '0px', border: 'none' },
+    classic: { bg: '#0f111a', nameColor: '#00f0ff', textColor: '#f1f5f9', radius: '12px', border: '1px solid rgba(255, 255, 255, 0.12)' },
+    pill: { bg: 'rgba(20, 24, 39, 0.9)', nameColor: '#38bdf8', textColor: '#f8fafc', radius: '9999px', border: '1px solid rgba(0, 240, 255, 0.25)' },
+    glass: { bg: 'rgba(255, 255, 255, 0.08)', nameColor: '#00f0ff', textColor: '#ffffff', radius: '14px', border: '1px solid rgba(255, 255, 255, 0.22)' },
+    neon: { bg: 'rgba(10, 10, 18, 0.95)', nameColor: '#00f0ff', textColor: '#a855f7', radius: '10px', border: '1.5px solid #00f0ff' },
+    borderless: { bg: 'transparent', nameColor: '#00f0ff', textColor: '#ffffff', radius: '0px', border: 'none' }
   };
 
   function updateStudioPreview() {
     if (!el.studioPreviewFeed) return;
-    const themeDef = THEME_DEFAULTS[studioState.theme] || THEME_DEFAULTS.classic;
+    const themeDef = THEME_DEFAULTS[studioState.theme] || THEME_DEFAULTS.pixel;
 
     el.studioPreviewFeed.style.setProperty('--studio-bg', studioState.bg);
     el.studioPreviewFeed.style.setProperty('--studio-name', studioState.nameColor);
@@ -1588,15 +1596,15 @@
     el.studioPreviewFeed.style.setProperty('--studio-border', themeDef.border);
 
     // Toggle avatars & badges in preview feed
-    el.studioPreviewFeed.querySelectorAll('.overlay-avatar-placeholder').forEach(av => {
+    el.studioPreviewFeed.querySelectorAll('.overlay-avatar-placeholder, .pixel-gift-avatar-wrap').forEach(av => {
       av.style.display = studioState.hideAvatar ? 'none' : 'flex';
     });
-    el.studioPreviewFeed.querySelectorAll('.overlay-badge').forEach(badge => {
+    el.studioPreviewFeed.querySelectorAll('.overlay-badge, .badge-mod').forEach(badge => {
       badge.style.display = studioState.hideBadges ? 'none' : 'inline-block';
     });
 
     // Update animations on existing preview items
-    el.studioPreviewFeed.querySelectorAll('.overlay-item').forEach(item => {
+    el.studioPreviewFeed.querySelectorAll('.overlay-item, .pixel-overlay-banner').forEach(item => {
       item.className = item.className.replace(/\banim-\w+/g, '') + ` anim-${studioState.anim}`;
     });
 
@@ -1608,7 +1616,7 @@
     const origin = window.location.origin;
     const params = new URLSearchParams();
 
-    if (studioState.theme !== 'classic') params.set('theme', studioState.theme);
+    if (studioState.theme !== 'pixel') params.set('theme', studioState.theme);
     if (studioState.font !== 'Poppins') params.set('font', studioState.font);
     if (Number(studioState.size) !== 13) params.set('size', studioState.size);
     if (studioState.bg !== THEME_DEFAULTS[studioState.theme]?.bg) params.set('bg', studioState.bg);
@@ -1624,34 +1632,77 @@
   }
 
   const MOCK_USERS = [
-    { name: 'Rian Pratama', text: 'Overlaynya keren banget bang! 🔥' },
+    { name: 'Rian Pratama', text: 'Overlaynya lucu banget bang! 🔥' },
     { name: 'Siti Rahma', text: 'Semangat terus live-nya kakak cantik! ✨' },
     { name: 'Dimas Gaming', text: 'Bang main game bareng penonton donggg' },
     { name: 'Aldo Wijaya', text: 'Halo semua penonton setia! Absen dari Surabaya' }
   ];
 
+  let mockToggle = 0;
   function spawnStudioMockMessage() {
     if (!el.studioPreviewFeed) return;
     const randomUser = MOCK_USERS[Math.floor(Math.random() * MOCK_USERS.length)];
-    const item = document.createElement('div');
-    item.className = `overlay-item anim-${studioState.anim}`;
-
     const initial = (randomUser.name[0] || 'U').toUpperCase();
-    item.innerHTML = `
-      <div class="overlay-avatar-placeholder" style="${studioState.hideAvatar ? 'display: none;' : ''}">${initial}</div>
-      <div class="overlay-body">
-        <div class="overlay-header">
-          <span class="overlay-nickname">${escapeHtml(randomUser.name)}</span>
-          <span class="overlay-badge badge-mod" style="${studioState.hideBadges ? 'display: none;' : ''}">USER</span>
+    const item = document.createElement('div');
+
+    if (studioState.theme === 'pixel') {
+      mockToggle = (mockToggle + 1) % 2;
+      if (mockToggle === 1) {
+        // Pixel Gift Banner (Crown & Avatar)
+        item.className = `pixel-overlay-banner pixel-gift-banner anim-${studioState.anim}`;
+        item.innerHTML = `
+          <img class="pixel-banner-bg" src="images/overlay-gift.png" alt="" />
+          <div class="pixel-gift-avatar-wrap" style="${studioState.hideAvatar ? 'display: none;' : ''}">
+            <div class="pixel-gift-avatar-placeholder">${initial}</div>
+          </div>
+          <div class="pixel-gift-content">
+            <div class="pixel-gift-author">
+              <span>${escapeHtml(randomUser.name)}</span>
+              <span class="combo-badge">x2</span>
+            </div>
+            <div class="pixel-gift-info">
+              <span>Mengirim <strong>Panda</strong></span>
+              🎁
+              <span class="pixel-diamond-tag">20 💎</span>
+            </div>
+          </div>
+        `;
+      } else {
+        // Pixel Comment Banner (Cat & TikTok badge)
+        item.className = `pixel-overlay-banner pixel-comment-banner anim-${studioState.anim}`;
+        const modBadge = (!studioState.hideBadges)
+          ? `<span class="overlay-badge badge-mod" style="font-size: 8px; padding: 0 4px; border-radius: 2px;">MOD</span>`
+          : '';
+        item.innerHTML = `
+          <img class="pixel-banner-bg" src="images/overlay-comment.png" alt="" />
+          <div class="pixel-comment-content">
+            <div class="pixel-comment-author">
+              <span>${escapeHtml(randomUser.name)}</span>
+              ${modBadge}
+            </div>
+            <div class="pixel-comment-msg">${escapeHtml(randomUser.text)}</div>
+          </div>
+        `;
+      }
+    } else {
+      // Standard Card Bubble
+      item.className = `overlay-item anim-${studioState.anim}`;
+      item.innerHTML = `
+        <div class="overlay-avatar-placeholder" style="${studioState.hideAvatar ? 'display: none;' : ''}">${initial}</div>
+        <div class="overlay-body">
+          <div class="overlay-header">
+            <span class="overlay-nickname">${escapeHtml(randomUser.name)}</span>
+            <span class="overlay-badge badge-mod" style="${studioState.hideBadges ? 'display: none;' : ''}">USER</span>
+          </div>
+          <div class="overlay-text">${escapeHtml(randomUser.text)}</div>
         </div>
-        <div class="overlay-text">${escapeHtml(randomUser.text)}</div>
-      </div>
-    `;
+      `;
+    }
 
     el.studioPreviewFeed.appendChild(item);
 
     // Limit preview items to 4
-    const items = el.studioPreviewFeed.querySelectorAll('.overlay-item');
+    const items = el.studioPreviewFeed.children;
     if (items.length > 4) {
       items[0].remove();
     }
