@@ -5,7 +5,7 @@ const tikTokService = require('../src/server/tiktokService');
 describe('Overlay Studio Configuration & Sanitization', () => {
   const SAFE_FONTS = ['Poppins', 'Montserrat', 'Roboto', 'Inter', 'Bangers', 'Ubuntu'];
   const VALID_ANIMATIONS = ['pop', 'slide', 'fade', 'bounce'];
-  const THEME_NAMES = ['pixel', 'classic', 'pill', 'glass', 'neon', 'borderless'];
+  const THEME_NAMES = ['pixel', 'cyberpunk', 'arcade', 'cozy', 'standard', 'classic'];
 
   function parseOverlayParams(paramsObj) {
     const theme = THEME_NAMES.includes(paramsObj.theme) ? paramsObj.theme : 'pixel';
