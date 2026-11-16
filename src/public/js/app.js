@@ -155,13 +155,9 @@
       state.ws.onopen = () => {
         measurePing();
         const settings = loadSettings();
-        if (settings.autoConnect && settings.lastUsername && !state.connected) {
+        // Populate channel input if empty, but NEVER auto-connect on startup!
+        if (settings.lastUsername && el.channelInput && !el.channelInput.value) {
           el.channelInput.value = settings.lastUsername;
-          setTimeout(() => {
-            if (!state.connected) {
-              el.btnConnect.click();
-            }
-          }, 400);
         }
       };
 
@@ -361,7 +357,7 @@
       stopObsAutoDetect();
     } else {
       const targetUser = (el.channelInput?.value || loadSettings().lastUsername || '').trim().replace(/^@+/, '');
-      if (state.obsAutoDetect && targetUser) {
+      if (state.obsAutoDetect && !state.manuallyDisconnected && targetUser) {
         el.statusDot.className = 'status-dot standby';
         el.statusText.textContent = `Standby OBS: @${targetUser}`;
       } else {
@@ -375,9 +371,6 @@
       `;
       el.btnConnect.classList.remove('btn-danger');
       el.channelInput.disabled = false;
-      if (state.obsAutoDetect) {
-        startObsAutoDetect();
-      }
     }
   }
 
@@ -826,10 +819,10 @@
   // Auto-Detect OBS Studio Live Session
   function startObsAutoDetect() {
     stopObsAutoDetect();
-    if (!state.obsAutoDetect) return;
+    if (!state.obsAutoDetect || state.manuallyDisconnected) return;
 
     const check = async () => {
-      if (state.connected || state.status === 'CONNECTED' || state.status === 'CONNECTING' || state.isCheckingLive) {
+      if (state.connected || state.status === 'CONNECTED' || state.status === 'CONNECTING' || state.isCheckingLive || state.manuallyDisconnected) {
         return;
       }
 
@@ -841,7 +834,7 @@
 
       updateAutoDetectStatusUI(true, `Standby: Menunggu siaran @${username} dimulai di OBS Studio...`);
 
-      if (!state.connected && state.status !== 'CONNECTING') {
+      if (!state.connected && state.status !== 'CONNECTING' && !state.manuallyDisconnected) {
         el.statusDot.className = 'status-dot standby';
         el.statusText.textContent = `Standby OBS: @${username}`;
       }
@@ -851,7 +844,7 @@
         const res = await fetch(`/api/check-live?username=${encodeURIComponent(username)}`);
         if (res.ok) {
           const data = await res.json();
-          if (data.success && data.isLive && !state.connected && state.status !== 'CONNECTING') {
+          if (data.success && data.isLive && !state.connected && state.status !== 'CONNECTING' && !state.manuallyDisconnected) {
             console.log(`[strechat] Siaran OBS untuk @${username} terdeteksi LIVE! Menghubungkan...`);
             showNotification(`🟢 Siaran OBS Terdeteksi! Menghubungkan ke @${username}...`, 'success');
             connectToTikTok(username);
@@ -864,8 +857,7 @@
       }
     };
 
-    state.obsAutoDetectTimer = setInterval(check, 6000);
-    setTimeout(check, 1200);
+    state.obsAutoDetectTimer = setInterval(check, 8000);
   }
 
   function stopObsAutoDetect() {
@@ -896,22 +888,41 @@
   function setupEventListeners() {
     // Connect / Disconnect Button
     el.btnConnect.addEventListener('click', () => {
-      if (state.connected) {
+      if (state.connected || state.status === 'CONNECTING') {
+        state.manuallyDisconnected = true;
+        stopObsAutoDetect();
+        state.obsAutoDetect = false;
+        saveSettings({ obsAutoDetect: false, autoConnect: false });
+        if (el.settingObsAutoDetect) el.settingObsAutoDetect.checked = false;
+        if (el.settingAutoConnect) el.settingAutoConnect.checked = false;
+        updateAutoDetectStatusUI(false, 'Auto-detect nonaktif (mode manual)');
+
         if (state.isDemo) {
           window.demoEngine.stop();
           state.isDemo = false;
           el.btnDemo.classList.remove('active');
+          state.connected = false;
+          state.status = 'DISCONNECTED';
           setUIConnectedState(false);
+          showNotification('Simulasi demo dihentikan', 'info');
           return;
         }
+
         sendWsAction('disconnect');
+
+        state.connected = false;
+        state.status = 'DISCONNECTED';
+        setUIConnectedState(false);
+        showNotification('Koneksi TikTok berhasil dihentikan.', 'info');
       } else {
+        state.manuallyDisconnected = false;
         const username = el.channelInput.value.trim().replace(/^@+/, '');
         if (!username) {
           showNotification('Masukkan username TikTok terlebih dahulu', 'error');
           el.channelInput.focus();
           return;
         }
+        saveSettings({ lastUsername: username });
         connectToTikTok(username);
       }
     });
@@ -1638,6 +1649,166 @@
     { name: 'Aldo Wijaya', text: 'Halo semua penonton setia! Absen dari Surabaya' }
   ];
 
+  // Studio SVG Banner Generators (Pure vector, zero external dependencies)
+  function buildStudioCommentSvg(name, text, hideBadges) {
+    const modBadge = !hideBadges
+      ? `<span style="background: rgba(16, 185, 129, 0.25); color: #059669; border: 1px solid rgba(16, 185, 129, 0.5); font-size: 8.5px; font-weight: 700; padding: 1px 5px; border-radius: 4px; text-transform: uppercase;">MOD</span>`
+      : '';
+    return `
+      <svg class="pixel-banner-svg" viewBox="0 0 460 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="comm-bg-s" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="55%" stop-color="#fcf8ff"/>
+            <stop offset="100%" stop-color="#f3e8ff"/>
+          </linearGradient>
+          <linearGradient id="comm-pill-s" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#3b1d6e"/>
+            <stop offset="100%" stop-color="#6b21a8"/>
+          </linearGradient>
+          <linearGradient id="comm-gold-s" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fde047"/>
+            <stop offset="50%" stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#d97706"/>
+          </linearGradient>
+          <filter id="comm-sh-s" x="-8%" y="-15%" width="120%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.35"/>
+          </filter>
+        </defs>
+        <g filter="url(#comm-sh-s)">
+          <circle cx="36" cy="72" r="14" fill="#c4b5fd" stroke="#251842" stroke-width="3"/>
+          <circle cx="48" cy="94" r="16" fill="#a7f3d0" stroke="#251842" stroke-width="3"/>
+          <circle cx="82" cy="98" r="13" fill="#fed7aa" stroke="#251842" stroke-width="3"/>
+          <circle cx="395" cy="98" r="12" fill="#bfdbfe" stroke="#251842" stroke-width="3"/>
+          <circle cx="414" cy="90" r="14" fill="#fbcfe8" stroke="#251842" stroke-width="3"/>
+          <rect x="24" y="28" width="412" height="76" rx="18" fill="url(#comm-bg-s)" stroke="#251842" stroke-width="3.5" stroke-linejoin="round"/>
+          <rect x="145" y="19" width="112" height="18" rx="9" fill="url(#comm-pill-s)" stroke="#251842" stroke-width="2.5"/>
+          <text x="201" y="31.5" font-family="'Poppins', sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">💬 TikTok Chat ♥</text>
+          <polygon points="340,28 348,6 360,26" fill="#ffffff" stroke="#251842" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="344,25 349,12 356,24" fill="#f472b6"/>
+          <polygon points="385,26 397,6 405,28" fill="#ffffff" stroke="#251842" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="389,24 396,12 401,25" fill="#f472b6"/>
+          <ellipse cx="372" cy="22" rx="24" ry="16" fill="#ffffff" stroke="#251842" stroke-width="3"/>
+          <path d="M 360 21 Q 364 16 368 21" stroke="#251842" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M 376 21 Q 380 16 384 21" stroke="#251842" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="358" cy="25" rx="3" ry="2" fill="#f9a8d4"/>
+          <ellipse cx="386" cy="25" rx="3" ry="2" fill="#f9a8d4"/>
+          <path d="M 370 24 Q 372 26 374 24" stroke="#ec4899" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <ellipse cx="352" cy="30" rx="6" ry="4" fill="#ffffff" stroke="#251842" stroke-width="2.5"/>
+          <ellipse cx="392" cy="30" rx="6" ry="4" fill="#ffffff" stroke="#251842" stroke-width="2.5"/>
+          <rect x="316" y="8" width="20" height="18" rx="6" fill="#ffffff" stroke="#251842" stroke-width="2"/>
+          <path d="M 334,16 L 339,18 L 334,20" fill="#ffffff" stroke="#251842" stroke-width="2" stroke-linejoin="round"/>
+          <text x="326" y="21" font-family="'Poppins', sans-serif" font-size="11" fill="#ec4899" text-anchor="middle" font-weight="900">♥</text>
+          <circle cx="68" cy="66" r="23" fill="#0b0e14" stroke="#251842" stroke-width="3"/>
+          <path d="M 72 56 L 72 70 A 5 5 0 1 1 67 65 A 5 5 0 0 1 70 65 L 70 54 L 75 54 A 8 8 0 0 0 78 59 L 78 56 A 6 6 0 0 1 72 56 Z" fill="#ff0055" transform="translate(1.2, 0.8)"/>
+          <path d="M 72 56 L 72 70 A 5 5 0 1 1 67 65 A 5 5 0 0 1 70 65 L 70 54 L 75 54 A 8 8 0 0 0 78 59 L 78 56 A 6 6 0 0 1 72 56 Z" fill="#00f0ff" transform="translate(-1.2, -0.8)"/>
+          <path d="M 72 56 L 72 70 A 5 5 0 1 1 67 65 A 5 5 0 0 1 70 65 L 70 54 L 75 54 A 8 8 0 0 0 78 59 L 78 56 A 6 6 0 0 1 72 56 Z" fill="#ffffff"/>
+          <polygon points="54,49 52,36 60,43 68,33 76,43 84,36 82,49" fill="url(#comm-gold-s)" stroke="#251842" stroke-width="2.5" stroke-linejoin="round"/>
+          <circle cx="68" cy="40" r="2.2" fill="#ef4444"/>
+          <circle cx="57" cy="42" r="1.8" fill="#38bdf8"/>
+          <circle cx="79" cy="42" r="1.8" fill="#38bdf8"/>
+          <path d="M 50 30 Q 52 28 50 26 Q 48 28 50 30" fill="#fde047"/>
+          <path d="M 85 32 Q 87 30 85 28 Q 83 30 85 32" fill="#fde047"/>
+          <path d="M 82,78 C 82,75 79,73 77,75 C 75,73 72,75 72,78 C 72,82 77,85 77,85 C 77,85 82,82 82,78 Z" fill="#f43f5e" stroke="#ffffff" stroke-width="1.5"/>
+        </g>
+        <foreignObject x="104" y="38" width="316" height="56">
+          <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; font-family: 'Poppins', sans-serif; overflow: hidden; box-sizing: border-box; padding-right: 8px;">
+            <div style="font-weight: 700; font-size: 13px; color: #2d184c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; display: flex; align-items: center; gap: 6px;">
+              <span>${escapeHtml(name)}</span>
+              ${modBadge}
+            </div>
+            <div style="font-weight: 600; font-size: 11.5px; color: #432168; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; word-break: break-word; margin-top: 1px;">
+              ${escapeHtml(text)}
+            </div>
+          </div>
+        </foreignObject>
+      </svg>
+    `;
+  }
+
+  function buildStudioGiftSvg(name, hideAvatar) {
+    const initial = escapeHtml((name.charAt(0) || 'G').toUpperCase());
+    const avatarInner = !hideAvatar
+      ? `<rect x="44" y="42" width="48" height="48" fill="url(#gift-av-s)"/><text x="68" y="72" font-family="'Poppins', sans-serif" font-size="18" font-weight="800" fill="#ffffff" text-anchor="middle">${initial}</text>`
+      : `<rect x="44" y="42" width="48" height="48" fill="#1e1b4b"/><text x="68" y="72" font-family="'Poppins', sans-serif" font-size="18" font-weight="800" fill="#a5b4fc" text-anchor="middle">🎁</text>`;
+    const clipId = `av-s-${Math.random().toString(36).slice(2, 7)}`;
+
+    return `
+      <svg class="pixel-banner-svg" viewBox="0 0 460 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gift-bg-s" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="50%" stop-color="#fdf4ff"/>
+            <stop offset="100%" stop-color="#fae8ff"/>
+          </linearGradient>
+          <linearGradient id="rainbow-g-s" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#38bdf8"/>
+            <stop offset="35%" stop-color="#facc15"/>
+            <stop offset="70%" stop-color="#f472b6"/>
+            <stop offset="100%" stop-color="#c084fc"/>
+          </linearGradient>
+          <linearGradient id="gift-gold-s" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fde047"/>
+            <stop offset="50%" stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#d97706"/>
+          </linearGradient>
+          <linearGradient id="gift-av-s" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#00f0ff"/>
+            <stop offset="100%" stop-color="#a855f7"/>
+          </linearGradient>
+          <clipPath id="${clipId}">
+            <circle cx="68" cy="66" r="22"/>
+          </clipPath>
+          <filter id="gift-sh-s" x="-8%" y="-15%" width="120%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.35"/>
+          </filter>
+        </defs>
+        <g filter="url(#gift-sh-s)">
+          <path d="M 40 92 Q 180 115 410 98" fill="none" stroke="url(#rainbow-g-s)" stroke-width="7" stroke-linecap="round"/>
+          <path d="M 42 95 Q 180 118 408 101" fill="none" stroke="#251842" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <polygon points="380,98 382,93 387,95 383,99 385,104 380,101 376,104 378,99 374,95 379,93" fill="#facc15" stroke="#251842" stroke-width="1.5"/>
+          <polygon points="42,88 44,84 48,85 45,89 47,93 42,91 38,93 40,89 37,85 41,84" fill="#f472b6" stroke="#251842" stroke-width="1.5"/>
+          <rect x="24" y="28" width="412" height="76" rx="18" fill="url(#gift-bg-s)" stroke="#251842" stroke-width="3.5" stroke-linejoin="round"/>
+          <circle cx="68" cy="66" r="24" fill="#ffffff" stroke="#251842" stroke-width="3.5"/>
+          <g clip-path="url(#${clipId})">
+            ${avatarInner}
+          </g>
+          <g transform="translate(42, 22) rotate(-15 20 20)">
+            <polygon points="8,26 6,12 16,19 26,8 36,19 46,12 44,26" fill="url(#gift-gold-s)" stroke="#251842" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="26" cy="16" r="2.2" fill="#ef4444"/>
+            <circle cx="14" cy="18" r="1.8" fill="#38bdf8"/>
+            <circle cx="38" cy="18" r="1.8" fill="#38bdf8"/>
+          </g>
+          <path d="M 38 28 Q 40 26 38 24 Q 36 26 38 28" fill="#fde047"/>
+          <path d="M 88 34 Q 90 32 88 30 Q 86 32 88 34" fill="#fde047"/>
+          <polygon points="98,28 100,24 104,25 101,29 103,33 98,31 94,33 96,29 93,25 97,24" fill="#facc15" stroke="#251842" stroke-width="1.5"/>
+          <path d="M 44,78 C 44,75 41,73 39,75 C 37,73 34,75 34,78 C 34,82 39,85 39,85 C 39,85 44,82 44,78 Z" fill="#ec4899" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="400" cy="66" r="22" fill="#0b0e14" stroke="#251842" stroke-width="3"/>
+          <path d="M 404 56 L 404 70 A 5 5 0 1 1 399 65 A 5 5 0 0 1 402 65 L 402 54 L 407 54 A 8 8 0 0 0 410 59 L 410 56 A 6 6 0 0 1 404 56 Z" fill="#ff0055" transform="translate(1, 0.7)"/>
+          <path d="M 404 56 L 404 70 A 5 5 0 1 1 399 65 A 5 5 0 0 1 402 65 L 402 54 L 407 54 A 8 8 0 0 0 410 59 L 410 56 A 6 6 0 0 1 404 56 Z" fill="#00f0ff" transform="translate(-1, -0.7)"/>
+          <path d="M 404 56 L 404 70 A 5 5 0 1 1 399 65 A 5 5 0 0 1 402 65 L 402 54 L 407 54 A 8 8 0 0 0 410 59 L 410 56 A 6 6 0 0 1 404 56 Z" fill="#ffffff"/>
+          <path d="M 390 42 Q 394 48 392 54" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <path d="M 406 38 Q 402 46 408 52" stroke="#f472b6" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <path d="M 382,46 C 382,44 380,42 378,44 C 376,42 374,44 374,46 C 374,49 378,52 378,52 C 378,52 382,49 382,46 Z" fill="#f43f5e" stroke="#251842" stroke-width="1.5"/>
+          <polygon points="418,74 420,70 424,71 421,75 423,79 418,77 414,79 416,75 413,71 417,70" fill="#facc15" stroke="#251842" stroke-width="1.5"/>
+        </g>
+        <foreignObject x="104" y="38" width="270" height="56">
+          <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; font-family: 'Poppins', sans-serif; overflow: hidden; box-sizing: border-box;">
+            <div style="font-weight: 700; font-size: 13.5px; color: #2d184c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; display: flex; align-items: center; gap: 6px;">
+              <span>${escapeHtml(name)}</span>
+              <span style="background: linear-gradient(135deg, #00f0ff, #a855f7); color: #fff; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 9999px; margin-left: 4px;">x2</span>
+            </div>
+            <div style="font-weight: 600; font-size: 11.5px; color: #432168; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px; margin-top: 2px;">
+              <span>Mengirim <strong>Panda</strong></span>
+              🎁
+              <span style="background: #fdf2f8; color: #db2777; font-weight: 700; padding: 1px 6px; border-radius: 9999px; border: 1px solid #f472b6; font-size: 10px;">20 💎</span>
+            </div>
+          </div>
+        </foreignObject>
+      </svg>
+    `;
+  }
+
   let mockToggle = 0;
   function spawnStudioMockMessage() {
     if (!el.studioPreviewFeed) return;
@@ -1647,42 +1818,13 @@
 
     if (studioState.theme === 'pixel') {
       mockToggle = (mockToggle + 1) % 2;
+      item.className = `pixel-overlay-banner anim-${studioState.anim}`;
       if (mockToggle === 1) {
-        // Pixel Gift Banner (Crown & Avatar)
-        item.className = `pixel-overlay-banner pixel-gift-banner anim-${studioState.anim}`;
-        item.innerHTML = `
-          <img class="pixel-banner-bg" src="images/overlay-gift.png" alt="" />
-          <div class="pixel-gift-avatar-wrap" style="${studioState.hideAvatar ? 'display: none;' : ''}">
-            <div class="pixel-gift-avatar-placeholder">${initial}</div>
-          </div>
-          <div class="pixel-gift-content">
-            <div class="pixel-gift-author">
-              <span>${escapeHtml(randomUser.name)}</span>
-              <span class="combo-badge">x2</span>
-            </div>
-            <div class="pixel-gift-info">
-              <span>Mengirim <strong>Panda</strong></span>
-              🎁
-              <span class="pixel-diamond-tag">20 💎</span>
-            </div>
-          </div>
-        `;
+        // Pixel Gift Banner
+        item.innerHTML = buildStudioGiftSvg(randomUser.name, studioState.hideAvatar);
       } else {
-        // Pixel Comment Banner (Cat & TikTok badge)
-        item.className = `pixel-overlay-banner pixel-comment-banner anim-${studioState.anim}`;
-        const modBadge = (!studioState.hideBadges)
-          ? `<span class="overlay-badge badge-mod" style="font-size: 8px; padding: 0 4px; border-radius: 2px;">MOD</span>`
-          : '';
-        item.innerHTML = `
-          <img class="pixel-banner-bg" src="images/overlay-comment.png" alt="" />
-          <div class="pixel-comment-content">
-            <div class="pixel-comment-author">
-              <span>${escapeHtml(randomUser.name)}</span>
-              ${modBadge}
-            </div>
-            <div class="pixel-comment-msg">${escapeHtml(randomUser.text)}</div>
-          </div>
-        `;
+        // Pixel Comment Banner
+        item.innerHTML = buildStudioCommentSvg(randomUser.name, randomUser.text, studioState.hideBadges);
       }
     } else {
       // Standard Card Bubble
