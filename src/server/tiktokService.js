@@ -126,17 +126,21 @@ class TikTokLiveService extends EventEmitter {
 
   _formatErrorMessage(err) {
     const raw = String(err?.message || err || '');
-    if (raw.toLowerCase().includes('not currently live') || raw.toLowerCase().includes('offline')) {
+    const lower = raw.toLowerCase();
+    if (lower.includes('not currently live') || lower.includes('offline') || lower.includes('hostnotonline')) {
       return `Streamer @${this.uniqueId} sedang offline / tidak sedang live.`;
     }
-    if (raw.toLowerCase().includes('user not found') || raw.toLowerCase().includes('404')) {
-      return `Pengguna @${this.uniqueId} tidak ditemukan di TikTok.`;
+    if (lower.includes('user not found') || lower.includes('usernotfound') || lower.includes('404')) {
+      return `Pengguna @${this.uniqueId} tidak ditemukan di TikTok. Periksa kembali ejaan username.`;
     }
-    if (raw.toLowerCase().includes('age restricted')) {
+    if (lower.includes('age restricted') || lower.includes('agerestricted')) {
       return `Live stream @${this.uniqueId} dibatasi usia (18+). Masukkan sessionid di Pengaturan untuk mengakses.`;
     }
-    if (raw.toLowerCase().includes('sessionrequired') || raw.toLowerCase().includes('session required')) {
+    if (lower.includes('sessionrequired') || lower.includes('session required')) {
       return `Live stream @${this.uniqueId} memerlukan sessionid TikTok di Pengaturan.`;
+    }
+    if (lower.includes('403') || lower.includes('blocked') || lower.includes('tiktokblocked')) {
+      return `Koneksi ke @${this.uniqueId} ditolak TikTok (HTTP 403). Akun mungkin sedang offline atau permintaan dibatasi sementara oleh TikTok. Pastikan akun sedang aktif LIVE.`;
     }
     return `Koneksi ke @${this.uniqueId} gagal: ${raw}`;
   }
@@ -464,7 +468,7 @@ class TikTokLiveService extends EventEmitter {
       return { isLive: false };
     } catch (err) {
       const msg = String(err?.message || '');
-      if (msg.includes('not online') || err?.name === 'HostNotOnlineError') {
+      if (msg.includes('not online') || err?.name === 'HostNotOnlineError' || msg.includes('403') || msg.includes('blocked')) {
         return { isLive: false };
       }
       return { isLive: false, error: msg };

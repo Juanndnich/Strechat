@@ -29,7 +29,7 @@
     pingMs: 0,
     uptimeTimer: null,
     isAlwaysOnTop: false,
-    obsAutoDetect: true,
+    obsAutoDetect: false,
     obsAutoDetectTimer: null,
     isCheckingLive: false
   };
@@ -1677,7 +1677,7 @@
     bannedWords: '',
     sessionId: '',
     autoConnect: false,
-    obsAutoDetect: true,
+    obsAutoDetect: false,
     lastUsername: ''
   };
 
@@ -1778,11 +1778,12 @@
       el.channelInput.value = settings.lastUsername;
     }
 
-    // Restore OBS Auto-Detect setting
-    state.obsAutoDetect = settings.obsAutoDetect !== false;
+    // Restore OBS Auto-Detect setting (defaults to false for flexible manual monitoring)
+    state.obsAutoDetect = !!settings.obsAutoDetect;
     if (el.settingObsAutoDetect) {
       el.settingObsAutoDetect.checked = state.obsAutoDetect;
     }
+    updateAutoDetectStatusUI(state.obsAutoDetect, state.obsAutoDetect ? `Standby: Menunggu siaran @${el.channelInput?.value || settings.lastUsername || 'streamer'} di OBS` : 'Mode Normal (Koneksi Manual). Auto-detect OBS nonaktif.');
 
     setupEventListeners();
     initWebSocket();
