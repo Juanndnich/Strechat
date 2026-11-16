@@ -41,6 +41,7 @@
     channelInput: document.getElementById('channel-input'),
     btnConnect: document.getElementById('btn-connect'),
     btnDemo: document.getElementById('btn-demo'),
+    btnAnalytics: document.getElementById('btn-analytics'),
     btnSettings: document.getElementById('btn-settings'),
     btnTheme: document.getElementById('btn-theme'),
     statusDot: document.getElementById('status-dot'),
@@ -325,9 +326,23 @@
     el.metricLikes.textContent = formatNumber(state.stats.totalLikes);
     el.metricDiamonds.textContent = formatNumber(state.stats.totalDiamonds);
     el.metricComments.textContent = formatNumber(state.stats.totalComments);
+
+    const indPeak = document.getElementById('ind-peak-val');
+    if (indPeak) indPeak.textContent = formatNumber(state.stats.peakViewers);
+
+    const indDiamond = document.getElementById('ind-diamond-val');
+    if (indDiamond) indDiamond.textContent = `💎 ${formatNumber(state.stats.totalDiamonds)}`;
+
+    const heroLikes = document.getElementById('hero-likes-val');
+    if (heroLikes) heroLikes.textContent = formatNumber(state.stats.totalLikes);
   }
 
   function setUIConnectedState(isConnected) {
+    const heroStreamer = document.getElementById('hero-streamer-name');
+    if (heroStreamer) {
+      heroStreamer.textContent = isConnected ? `@${state.uniqueId || 'host'}` : 'Belum Terhubung';
+    }
+
     if (isConnected) {
       el.statusDot.className = 'status-dot connected';
       el.statusText.textContent = `Terhubung: @${state.uniqueId || 'host'}`;
@@ -426,7 +441,10 @@
     state.stats.totalLikes += (Number(data.likeCount) || 1);
     el.metricLikes.textContent = formatNumber(state.stats.totalLikes);
 
-    const heartIcon = document.querySelector('.metric-card.likes svg');
+    const heroLikes = document.getElementById('hero-likes-val');
+    if (heroLikes) heroLikes.textContent = formatNumber(state.stats.totalLikes);
+
+    const heartIcon = document.querySelector('.hero-stat-pill .pill-icon.likes svg, .metric-card.likes svg');
     if (heartIcon) {
       heartIcon.classList.remove('heart-pulse');
       void heartIcon.offsetWidth;
@@ -442,6 +460,8 @@
     state.stats.totalGifts += (data.repeatEnd ? data.repeatCount : 1);
 
     el.metricDiamonds.textContent = formatNumber(state.stats.totalDiamonds);
+    const indDia = document.getElementById('ind-diamond-val');
+    if (indDia) indDia.textContent = `💎 ${formatNumber(state.stats.totalDiamonds)}`;
 
     // Audio chime
     if (window.soundEngine) {
@@ -457,6 +477,7 @@
     // Render into chat feed as a stylish gift row
     if (data.repeatEnd || data.repeatCount === 1) {
       renderInlineGift(data, diamonds);
+      loadAnalyticsData();
     }
 
     // Floating Banner Pooling: Update existing combo or show max 2 compact banners
@@ -662,6 +683,34 @@
 
       const totalDiaEl = document.getElementById('analytics-total-diamonds');
       if (totalDiaEl) totalDiaEl.textContent = `${formatNumber(summary.totalDiamonds || 0)} Diamond`;
+
+      // Update Mini Dashboard Leaderboard
+      const miniEl = document.getElementById('mini-leaderboard');
+      if (miniEl) {
+        if (!data.topGifters || data.topGifters.length === 0) {
+          miniEl.innerHTML = `
+            <div class="leaderboard-empty" style="text-align: center; padding: 24px 10px; color: var(--text-muted); font-size: 12px;">
+              Belum ada gift yang masuk pada sesi ini.
+            </div>
+          `;
+        } else {
+          miniEl.innerHTML = data.topGifters.slice(0, 5).map((g, idx) => {
+            const avatarHtml = g.avatar
+              ? `<img src="${g.avatar}" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;" onerror="this.outerHTML='<div class=\\'donor-rank\\'>${(g.nickname || 'U')[0].toUpperCase()}</div>'">`
+              : `<div class="donor-rank rank-${idx + 1}">${idx + 1}</div>`;
+
+            return `
+              <div class="leaderboard-mini-item">
+                <div class="donor-left">
+                  ${avatarHtml}
+                  <span class="donor-name">${escapeHtml(g.nickname)}</span>
+                </div>
+                <span class="donor-diamonds">💎 ${formatNumber(g.diamonds)}</span>
+              </div>
+            `;
+          }).join('');
+        }
+      }
 
       const listEl = document.getElementById('leaderboard-list');
       if (!listEl) return;
@@ -895,6 +944,88 @@
           showNotification('Silakan tutup tab browser Anda untuk keluar.', 'info');
         }
       });
+    }
+
+    // Sidebar Navigation Hooks (Reference Style)
+    const navOverview = document.getElementById('nav-overview');
+    if (navOverview) {
+      navOverview.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-nav .nav-btn').forEach(b => b.classList.remove('active'));
+        navOverview.classList.add('active');
+        const scrollArea = document.querySelector('.admin-scroll-area');
+        if (scrollArea) scrollArea.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    const navChat = document.getElementById('nav-chat');
+    if (navChat) {
+      navChat.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-nav .nav-btn').forEach(b => b.classList.remove('active'));
+        navChat.classList.add('active');
+        const chatFeed = document.getElementById('chat-container');
+        if (chatFeed) chatFeed.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (el.chatSearchInput) el.chatSearchInput.focus();
+      });
+    }
+
+    const navAnalytics = document.getElementById('nav-analytics');
+    if (navAnalytics) {
+      navAnalytics.addEventListener('click', () => {
+        if (el.btnAnalytics) el.btnAnalytics.click();
+      });
+    }
+
+    const navStudio = document.getElementById('nav-studio');
+    if (navStudio) {
+      navStudio.addEventListener('click', () => {
+        if (el.btnOverlayStudio) el.btnOverlayStudio.click();
+      });
+    }
+
+    const navProfiles = document.getElementById('nav-profiles');
+    if (navProfiles) {
+      navProfiles.addEventListener('click', () => {
+        if (el.btnProfiles) el.btnProfiles.click();
+      });
+    }
+
+    const navTheme = document.getElementById('nav-theme');
+    if (navTheme) {
+      navTheme.addEventListener('click', () => {
+        if (el.btnTheme) el.btnTheme.click();
+      });
+    }
+
+    const navSettings = document.getElementById('nav-settings');
+    if (navSettings) {
+      navSettings.addEventListener('click', () => {
+        if (el.btnSettings) el.btnSettings.click();
+      });
+    }
+
+    // Dashboard Card Quick Action Buttons
+    const btnQuickStudio = document.getElementById('btn-quick-studio');
+    if (btnQuickStudio) {
+      btnQuickStudio.addEventListener('click', () => {
+        if (el.btnOverlayStudio) el.btnOverlayStudio.click();
+      });
+    }
+
+    const btnOpenAnalyticsModal = document.getElementById('btn-open-analytics-modal');
+    if (btnOpenAnalyticsModal) {
+      btnOpenAnalyticsModal.addEventListener('click', () => {
+        if (el.btnAnalytics) el.btnAnalytics.click();
+      });
+    }
+
+    const btnDashExportCsv = document.getElementById('btn-dash-export-csv');
+    if (btnDashExportCsv) {
+      btnDashExportCsv.addEventListener('click', () => downloadExport('csv'));
+    }
+
+    const btnDashExportJson = document.getElementById('btn-dash-export-json');
+    if (btnDashExportJson) {
+      btnDashExportJson.addEventListener('click', () => downloadExport('json'));
     }
 
     el.btnCloseSettings.addEventListener('click', () => {
@@ -1562,6 +1693,7 @@
     loadServerInfo();
     renderProfiles();
     updateStudioUrl();
+    loadAnalyticsData();
   }
 
   document.addEventListener('DOMContentLoaded', init);

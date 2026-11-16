@@ -1,7 +1,7 @@
 # STRECHAT — AI AGENT DEVELOPMENT GUIDELINES
 
 **Project:** Strechat
-**Current Version:** 1.0.0
+**Current Version:** 1.1.0
 **Application Type:** Cross-platform Desktop Application & Local Web Service
 **License:** MIT
 **Primary Stack:** Node.js, Electron, Express.js, WebSocket, Vanilla JavaScript

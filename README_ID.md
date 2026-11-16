@@ -3,7 +3,7 @@
 > **Aplikasi Pendamping & Pemantau Live TikTok Ringan, Zero-Delay untuk Desktop dan OBS Studio.**  
 > Pantau aktivitas TikTok LIVE Anda di luar OBS secara real-time: jumlah penonton langsung, animasi gift, kecepatan suka (tap), papan peringkat donatur, analitik sesi, overlay transparan OBS, dan notifikasi audio/TTS.
 
-[![Rilis](https://img.shields.io/badge/rilis-v1.0.0-indigo.svg)](https://github.com/Juanndnich/Strechat/releases)
+[![Rilis](https://img.shields.io/badge/rilis-v1.1.0-cyan.svg)](https://github.com/Juanndnich/Strechat/releases)
 [![Lisensi: MIT](https://img.shields.io/badge/Lisensi-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20OBS-blue.svg)](#)
 

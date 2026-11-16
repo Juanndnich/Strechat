@@ -42,7 +42,7 @@ app.get('/api/info', (req, res) => {
 
   res.json({
     name: 'strechat',
-    version: '1.0.0',
+    version: '1.1.0',
     port,
     localIp,
     remoteUrl: `http://${localIp}:${port}`,

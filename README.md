@@ -3,7 +3,7 @@
 > **Lightweight, Zero-Delay TikTok Live Monitor & OBS Streaming Companion.**  
 > Monitor your TikTok Live stream outside OBS with real-time viewer counts, animated gifts, like velocity, top donor leaderboards, session analytics, transparent OBS overlays, and audio/TTS alerts.
 
-[![Release](https://img.shields.io/badge/release-v1.0.0-indigo.svg)](https://github.com/Juanndnich/Strechat/releases)
+[![Release](https://img.shields.io/badge/release-v1.1.0-cyan.svg)](https://github.com/Juanndnich/Strechat/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20OBS-blue.svg)](#)
 
