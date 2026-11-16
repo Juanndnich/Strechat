@@ -108,12 +108,21 @@ describe('TikTok Service Privacy and Token Isolation', () => {
     assert.strictEqual(JSON.stringify(status).includes('secret_tiktok_session_token_12345'), false);
   });
 
-  it('checkLiveStatus() should safely validate username and handle offline status without crashing', async () => {
-    const invalidResult = await tikTokService.checkLiveStatus('');
-    assert.strictEqual(invalidResult.isLive, false);
-    assert.strictEqual(invalidResult.error, 'Username tidak valid');
+  it('checkLiveStatus() should safely validate username and handle invalid input without crashing', async () => {
+    const invalidResult1 = await tikTokService.checkLiveStatus('');
+    assert.strictEqual(invalidResult1.isLive, false);
+    assert.strictEqual(invalidResult1.error, 'Username tidak valid');
 
-    const offlineResult = await tikTokService.checkLiveStatus('streamer_tidak_ditemukan_xyz_999');
-    assert.strictEqual(offlineResult.isLive, false);
+    const invalidResult2 = await tikTokService.checkLiveStatus('   ');
+    assert.strictEqual(invalidResult2.isLive, false);
+    assert.strictEqual(invalidResult2.error, 'Username tidak valid');
+
+    const invalidResult3 = await tikTokService.checkLiveStatus(null);
+    assert.strictEqual(invalidResult3.isLive, false);
+    assert.strictEqual(invalidResult3.error, 'Username tidak valid');
+
+    const invalidResult4 = await tikTokService.checkLiveStatus('@@@');
+    assert.strictEqual(invalidResult4.isLive, false);
+    assert.strictEqual(invalidResult4.error, 'Username tidak valid');
   });
 });
