@@ -946,63 +946,6 @@
       });
     }
 
-    // Sidebar Navigation Hooks (Reference Style)
-    const navOverview = document.getElementById('nav-overview');
-    if (navOverview) {
-      navOverview.addEventListener('click', () => {
-        document.querySelectorAll('.sidebar-nav .nav-btn').forEach(b => b.classList.remove('active'));
-        navOverview.classList.add('active');
-        const scrollArea = document.querySelector('.admin-scroll-area');
-        if (scrollArea) scrollArea.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    }
-
-    const navChat = document.getElementById('nav-chat');
-    if (navChat) {
-      navChat.addEventListener('click', () => {
-        document.querySelectorAll('.sidebar-nav .nav-btn').forEach(b => b.classList.remove('active'));
-        navChat.classList.add('active');
-        const chatFeed = document.getElementById('chat-container');
-        if (chatFeed) chatFeed.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        if (el.chatSearchInput) el.chatSearchInput.focus();
-      });
-    }
-
-    const navAnalytics = document.getElementById('nav-analytics');
-    if (navAnalytics) {
-      navAnalytics.addEventListener('click', () => {
-        if (el.btnAnalytics) el.btnAnalytics.click();
-      });
-    }
-
-    const navStudio = document.getElementById('nav-studio');
-    if (navStudio) {
-      navStudio.addEventListener('click', () => {
-        if (el.btnOverlayStudio) el.btnOverlayStudio.click();
-      });
-    }
-
-    const navProfiles = document.getElementById('nav-profiles');
-    if (navProfiles) {
-      navProfiles.addEventListener('click', () => {
-        if (el.btnProfiles) el.btnProfiles.click();
-      });
-    }
-
-    const navTheme = document.getElementById('nav-theme');
-    if (navTheme) {
-      navTheme.addEventListener('click', () => {
-        if (el.btnTheme) el.btnTheme.click();
-      });
-    }
-
-    const navSettings = document.getElementById('nav-settings');
-    if (navSettings) {
-      navSettings.addEventListener('click', () => {
-        if (el.btnSettings) el.btnSettings.click();
-      });
-    }
-
     // Dashboard Card Quick Action Buttons
     const btnQuickStudio = document.getElementById('btn-quick-studio');
     if (btnQuickStudio) {

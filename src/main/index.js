@@ -96,9 +96,9 @@ if (!gotTheLock) {
 
 async function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 520,
-    height: 860,
-    minWidth: 420,
+    width: 1080,
+    height: 720,
+    minWidth: 800,
     minHeight: 580,
     frame: false, // Custom sleek titlebar
     backgroundColor: '#0c0d12',
